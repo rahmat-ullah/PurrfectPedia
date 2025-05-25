@@ -33,13 +33,14 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor, // Use theme's card color
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: theme.shadowColor.withOpacity(0.1), // Use theme's shadow color
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -48,12 +49,20 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
       child: TextField(
         controller: _controller,
         onChanged: widget.onSearchChanged,
+        style: TextStyle(color: theme.colorScheme.onSurface), // Input text color
         decoration: InputDecoration(
           hintText: widget.hintText,
-          prefixIcon: const Icon(Icons.search),
+          hintStyle: TextStyle(color: theme.colorScheme.onSurface.withOpacity(0.5)), // Hint text color
+          prefixIcon: Icon(
+            Icons.search,
+            color: theme.colorScheme.onSurface.withOpacity(0.7), // Icon color
+          ),
           suffixIcon: _controller.text.isNotEmpty
               ? IconButton(
-                  icon: const Icon(Icons.clear),
+                  icon: Icon(
+                    Icons.clear,
+                    color: theme.colorScheme.onSurface.withOpacity(0.7), // Icon color
+                  ),
                   onPressed: () {
                     _controller.clear();
                     widget.onSearchChanged('');
@@ -65,7 +74,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
             borderSide: BorderSide.none,
           ),
           filled: true,
-          fillColor: Colors.white,
+          fillColor: theme.colorScheme.surface, // TextField fill color
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 16,
             vertical: 12,
@@ -74,4 +83,4 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
       ),
     );
   }
-} 
+}

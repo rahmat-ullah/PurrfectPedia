@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:purrfect_pedia/services/theme_provider.dart';
+import 'package:purrfect_pedia/models/theme_preference.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -8,7 +11,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  bool _isDarkMode = false;
+  // bool _isDarkMode = false; // Removed
   String _selectedLanguage = 'English';
   bool _notificationsEnabled = true;
 
@@ -205,18 +208,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Card(
               child: Column(
                 children: [
-                  ListTile(
-                    leading: const Icon(Icons.dark_mode),
-                    title: const Text('Dark Mode'),
-                    trailing: Switch(
-                      value: _isDarkMode,
-                      onChanged: (value) {
-                        setState(() {
-                          _isDarkMode = value;
-                        });
-                        // TODO: Implement theme switching
-                      },
-                    ),
+                  Consumer<ThemeProvider>(
+                    builder: (context, themeProvider, child) {
+                      bool isCurrentlyDark;
+                      // Determine actual brightness if system is selected
+                      Brightness systemBrightness = MediaQuery.platformBrightnessOf(context);
+
+                      if (themeProvider.currentPreference == ThemeModePreference.system) {
+                        isCurrentlyDark = systemBrightness == Brightness.dark;
+                      } else {
+                        isCurrentlyDark = themeProvider.currentPreference == ThemeModePreference.dark;
+                      }
+
+                      return ListTile(
+                        leading: const Icon(Icons.dark_mode),
+                        title: const Text('Dark Mode'), // Later change to 'Theme'
+                        subtitle: Text('Current: ${themeProvider.currentPreference.toString().split('.').last}'), // To show current mode
+                        trailing: Switch(
+                          value: isCurrentlyDark, // Reflects explicit dark or system-being-dark
+                          onChanged: (value) {
+                            // When toggled, switch between explicit light and dark.
+                            ThemeModePreference newPreference = value ? ThemeModePreference.dark : ThemeModePreference.light;
+                            themeProvider.setThemePreference(newPreference);
+                          },
+                        ),
+                      );
+                    }
                   ),
                   const Divider(height: 1),
                   ListTile(

@@ -57,16 +57,16 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      floatingActionButton: _currentIndex == 1
-          ? null
-          : FloatingActionButton(
-              onPressed: () {
-                setState(() {
-                  _currentIndex = 1; // Switch to recognition screen
-                });
-              },
-              child: const Icon(Icons.camera_alt),
-            ),
+      // floatingActionButton: _currentIndex == 1 // Removed FAB
+      //     ? null
+      //     : FloatingActionButton(
+      //         onPressed: () {
+      //           setState(() {
+      //             _currentIndex = 1; // Switch to recognition screen
+      //           });
+      //         },
+      //         child: const Icon(Icons.camera_alt),
+      //       ),
     );
   }
-} 
+}

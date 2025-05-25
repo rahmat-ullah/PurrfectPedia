@@ -158,11 +158,13 @@ class _EncyclopediaScreenState extends State<EncyclopediaScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // Get theme data
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Cat Encyclopedia'),
-        backgroundColor: Theme.of(context).primaryColor,
-        foregroundColor: Colors.white,
+        // backgroundColor: theme.primaryColor, // Already set by theme
+        // foregroundColor: Colors.white, // Already set by theme
         elevation: 0,
       ),
       body: Column(
@@ -170,7 +172,7 @@ class _EncyclopediaScreenState extends State<EncyclopediaScreen> {
           // Search and Filter Section
           Container(
             padding: const EdgeInsets.all(16),
-            color: Theme.of(context).primaryColor.withOpacity(0.1),
+            color: theme.colorScheme.surfaceVariant, // Updated background
             child: Column(
               children: [
                 SearchBarWidget(
@@ -190,11 +192,20 @@ class _EncyclopediaScreenState extends State<EncyclopediaScreen> {
                       return Padding(
                         padding: const EdgeInsets.only(right: 8),
                         child: FilterChip(
-                          label: Text(filter),
+                          label: Text(
+                            filter,
+                            style: TextStyle(
+                              color: isSelected 
+                                  ? theme.colorScheme.onPrimaryContainer 
+                                  : theme.colorScheme.onSurface,
+                            ),
+                          ),
                           selected: isSelected,
                           onSelected: (_) => _onFilterChanged(filter),
-                          backgroundColor: Colors.white,
-                          selectedColor: Theme.of(context).primaryColor.withOpacity(0.2),
+                          backgroundColor: theme.chipTheme.backgroundColor ?? theme.colorScheme.surface,
+                          selectedColor: theme.chipTheme.selectedColor ?? theme.colorScheme.primaryContainer,
+                          // Ensure checkmark color is appropriate if default is not visible
+                          checkmarkColor: isSelected ? theme.colorScheme.onPrimaryContainer : theme.colorScheme.onSurface,
                         ),
                       );
                     },
@@ -207,16 +218,20 @@ class _EncyclopediaScreenState extends State<EncyclopediaScreen> {
           // Breeds List
           Expanded(
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary)))
                 : _filteredBreeds.isEmpty
-                    ? const Center(
+                    ? Center(
                         child: Text(
                           'No breeds found',
-                          style: TextStyle(fontSize: 18, color: Colors.grey),
+                          style: TextStyle(
+                            fontSize: 18, 
+                            color: theme.colorScheme.onBackground.withOpacity(0.6), // Updated text color
+                          ),
                         ),
                       )
                     : RefreshIndicator(
                         onRefresh: _loadBreeds,
+                        color: theme.colorScheme.primary, // Refresh indicator color
                         child: ListView.builder(
                           padding: const EdgeInsets.all(16),
                           itemCount: _filteredBreeds.length,

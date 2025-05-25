@@ -15,8 +15,12 @@ class FactCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final categoryStyle = _getCategoryStyle(fact.category, theme);
+
     return Card(
       elevation: 2,
+      // color: theme.cardColor, // Or rely on global card theme
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -44,7 +48,7 @@ class FactCard extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: _getCategoryColor(fact.category).withOpacity(0.1),
+                    color: categoryStyle.backgroundColor,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(
@@ -52,7 +56,7 @@ class FactCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: _getCategoryColor(fact.category),
+                      color: categoryStyle.textColor,
                     ),
                   ),
                 ),
@@ -63,13 +67,19 @@ class FactCard extends StatelessWidget {
                   children: [
                     if (onFavorite != null)
                       IconButton(
-                        icon: const Icon(Icons.favorite_border),
+                        icon: Icon(
+                          Icons.favorite_border,
+                          color: theme.iconTheme.color ?? theme.colorScheme.onSurface.withOpacity(0.7),
+                        ),
                         onPressed: onFavorite,
                         iconSize: 20,
                       ),
                     if (onShare != null)
                       IconButton(
-                        icon: const Icon(Icons.share),
+                        icon: Icon(
+                          Icons.share,
+                          color: theme.iconTheme.color ?? theme.colorScheme.onSurface.withOpacity(0.7),
+                        ),
                         onPressed: onShare,
                         iconSize: 20,
                       ),
@@ -83,19 +93,41 @@ class FactCard extends StatelessWidget {
     );
   }
 
-  Color _getCategoryColor(String category) {
+  _CategoryStyle _getCategoryStyle(String category, ThemeData theme) {
     switch (category.toLowerCase()) {
       case 'health':
-        return Colors.red;
+        return _CategoryStyle(
+          backgroundColor: theme.colorScheme.errorContainer,
+          textColor: theme.colorScheme.onErrorContainer,
+        );
       case 'behavior':
-        return Colors.blue;
+        return _CategoryStyle(
+          backgroundColor: theme.colorScheme.tertiaryContainer,
+          textColor: theme.colorScheme.onTertiaryContainer,
+        );
       case 'history':
-        return Colors.orange;
+        return _CategoryStyle(
+          backgroundColor: theme.colorScheme.secondaryContainer,
+          textColor: theme.colorScheme.onSecondaryContainer,
+        );
       case 'fun':
-        return Colors.purple;
+        return _CategoryStyle(
+          backgroundColor: theme.colorScheme.primaryContainer, // Example, adjust as needed
+          textColor: theme.colorScheme.onPrimaryContainer,
+        );
       case 'general':
       default:
-        return Colors.green;
+        return _CategoryStyle(
+          backgroundColor: theme.colorScheme.surfaceVariant,
+          textColor: theme.colorScheme.onSurfaceVariant,
+        );
     }
   }
-} 
+}
+
+class _CategoryStyle {
+  final Color backgroundColor;
+  final Color textColor;
+
+  _CategoryStyle({required this.backgroundColor, required this.textColor});
+}
