@@ -1,19 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:purrfect_pedia/services/theme_provider.dart';
-import 'screens/home_screen.dart';
+import 'package:purrfect_pedia/screens/home_screen.dart';
+import 'package:purrfect_pedia/screens/auth_screen.dart';
+import 'package:purrfect_pedia/screens/onboarding_screen_1.dart';
+import 'package:purrfect_pedia/screens/onboarding_screen_2.dart';
+import 'package:purrfect_pedia/services/onboarding_service.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 // ThemeModePreference is not directly used in main.dart but good to have if needed later.
 // import 'package:purrfect_pedia/models/theme_preference.dart';
 
-void main() async { // Make main async
-  WidgetsFlutterBinding.ensureInitialized(); // Important for SharedPreferences
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(); // Initialize Firebase
+
+  // ThemeProvider initialization remains
   final themeProvider = ThemeProvider();
-  await themeProvider.loadThemePreference(); // Load saved preference
+  await themeProvider.loadThemePreference();
 
   runApp(
     ChangeNotifierProvider(
       create: (_) => themeProvider,
-      child: const PurrfectPediaApp(),
+      child: const PurrfectPediaApp(), // MaterialApp will be built inside PurrfectPediaApp
     ),
   );
 }
@@ -25,44 +35,46 @@ class PurrfectPediaApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
-    // Define New Light Theme
+    // Theme definitions (lightTheme, darkTheme) remain the same as before
+    // For brevity, I'm omitting the full theme data here, but it should be retained.
+    // Assume lightTheme and darkTheme are defined as they were previously.
     final ThemeData lightTheme = ThemeData(
       brightness: Brightness.light,
       primaryColor: Colors.blueGrey[700], // #546E7A
-      scaffoldBackgroundColor: Colors.white, // Or Colors.grey[50] (#FAFAFA)
+      scaffoldBackgroundColor: Colors.white, 
       colorScheme: ColorScheme.light(
-        primary: Colors.blueGrey[700]!, // #546E7A
-        secondary: Colors.blueGrey[600]!, // #607D8B (example, can be same as primary)
-        background: Colors.white, // Or Colors.grey[50] (#FAFAFA)
-        surface: Colors.grey[100]!, // #F5F5F5
+        primary: Colors.blueGrey[700]!, 
+        secondary: Colors.blueGrey[600]!, 
+        background: Colors.white, 
+        surface: Colors.grey[100]!, 
         onPrimary: Colors.white,
-        onSecondary: Colors.white, // For text/icons on secondary color
+        onSecondary: Colors.white, 
         onBackground: Colors.black87,
-        onSurface: Colors.black87, // For text/icons on surface color (cards)
+        onSurface: Colors.black87, 
       ),
       appBarTheme: AppBarTheme(
-        backgroundColor: Colors.blueGrey[700], // #546E7A
-        foregroundColor: Colors.white, // For title and icons
-        elevation: 0, // Or a subtle elevation like 2 or 4
+        backgroundColor: Colors.blueGrey[700], 
+        foregroundColor: Colors.white, 
+        elevation: 0, 
         centerTitle: true,
         titleTextStyle: const TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w600,
           color: Colors.white,
         ),
-        iconTheme: const IconThemeData(color: Colors.white), // Ensure icons are white
+        iconTheme: const IconThemeData(color: Colors.white), 
       ),
       cardTheme: CardThemeData(
         elevation: 2,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
-        color: Colors.grey[100], // #F5F5F5
+        color: Colors.grey[100], 
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blueGrey[700], // #546E7A
-          foregroundColor: Colors.white, // Text color for elevated button
+          backgroundColor: Colors.blueGrey[700], 
+          foregroundColor: Colors.white, 
           elevation: 2,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
@@ -71,22 +83,13 @@ class PurrfectPediaApp extends StatelessWidget {
         ),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: Colors.blueGrey[700], // #546E7A
+        backgroundColor: Colors.blueGrey[700], 
         foregroundColor: Colors.white,
         elevation: 4,
       ),
-      // fontFamily: 'Poppins', // Keep if font is set up
       useMaterial3: true,
-      // Define text themes if needed, for example:
-      // textTheme: TextTheme(
-      //   bodyLarge: TextStyle(color: Colors.black87),
-      //   bodyMedium: TextStyle(color: Colors.grey[800]),
-      //   titleMedium: TextStyle(color: Colors.black87),
-      //   headlineSmall: TextStyle(color: Colors.black87),
-      // ),
     );
 
-    // Define Dark Theme (remains unchanged)
     final ThemeData darkTheme = ThemeData(
       brightness: Brightness.dark,
       primaryColor: const Color(0xFF433D8B),
@@ -95,35 +98,34 @@ class PurrfectPediaApp extends StatelessWidget {
         secondary: const Color(0xFFC8ACD6),
         background: const Color(0xFF17153B),
         surface: const Color(0xFF2E236C),
-        onPrimary: Colors.white, // For text/icons on primary color
-        onSecondary: Colors.black, // For text/icons on secondary color
-        onBackground: Colors.white, // For text/icons on background color
-        onSurface: Colors.white, // For text/icons on surface color
+        onPrimary: Colors.white, 
+        onSecondary: Colors.black, 
+        onBackground: Colors.white, 
+        onSurface: Colors.white, 
       ),
-      // fontFamily: 'Poppins', // Commented out until font files are added
       appBarTheme: const AppBarTheme(
         elevation: 0,
         centerTitle: true,
-        backgroundColor: Color(0xFF433D8B), // Dark theme primary
+        backgroundColor: Color(0xFF433D8B), 
         titleTextStyle: TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w600,
-          color: Colors.white, // Adjusted for dark primary
+          color: Colors.white, 
         ),
-        iconTheme: IconThemeData(color: Colors.white), // Adjusted for dark primary
+        iconTheme: IconThemeData(color: Colors.white), 
       ),
       cardTheme: CardThemeData(
         elevation: 2,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
-        color: const Color(0xFF2E236C), // Dark theme card/surface
+        color: const Color(0xFF2E236C), 
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           elevation: 2,
-          backgroundColor: const Color(0xFFC8ACD6), // Dark theme secondary/accent
-          foregroundColor: Colors.black, // Text color for elevated button
+          backgroundColor: const Color(0xFFC8ACD6), 
+          foregroundColor: Colors.black, 
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
@@ -135,19 +137,56 @@ class PurrfectPediaApp extends StatelessWidget {
       ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         elevation: 4,
-        backgroundColor: Color(0xFFC8ACD6), // Dark theme secondary/accent
+        backgroundColor: Color(0xFFC8ACD6), 
         foregroundColor: Colors.black,
       ),
       useMaterial3: true,
     );
 
+
     return MaterialApp(
       title: 'PurrfectPedia',
       debugShowCheckedModeBanner: false,
-      theme: lightTheme, 
-      darkTheme: darkTheme, 
-      themeMode: themeProvider.themeMode, // Use themeMode from provider
-      home: const HomeScreen(),
+      theme: lightTheme, // Retain your light theme
+      darkTheme: darkTheme, // Retain your dark theme
+      themeMode: themeProvider.themeMode,
+      // Define named routes
+      routes: {
+        '/auth': (context) => const AuthScreen(),
+        '/home': (context) => const HomeScreen(),
+        '/onboarding1': (context) => const OnboardingScreen1(),
+        '/onboarding2': (context) => const OnboardingScreen2(),
+      },
+      // Dynamic initial routing logic
+      home: StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          // Show loading indicator while checking auth state
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          }
+
+          if (snapshot.hasData) { // User is logged in
+            // Now check onboarding status
+            return FutureBuilder<bool>(
+              future: OnboardingService().isOnboardingComplete(),
+              builder: (context, onboardingSnapshot) {
+                if (onboardingSnapshot.connectionState == ConnectionState.waiting) {
+                  return const Scaffold(body: Center(child: CircularProgressIndicator()));
+                }
+                // If onboarding is complete, or if there's an error reading status (default to home)
+                if (onboardingSnapshot.data == true) {
+                  return const HomeScreen(); // Navigate to home
+                } else {
+                  return const OnboardingScreen1(); // Navigate to onboarding
+                }
+              },
+            );
+          } else { // User is not logged in
+            return const AuthScreen(); // Navigate to auth screen
+          }
+        },
+      ),
     );
   }
 }
