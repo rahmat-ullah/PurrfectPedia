@@ -16,9 +16,13 @@ class BreedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Card(
       elevation: 2,
       clipBehavior: Clip.antiAlias,
+      // Consider setting card color if not inheriting from theme:
+      // color: theme.cardColor, 
       child: InkWell(
         onTap: onTap,
         child: Column(
@@ -37,8 +41,8 @@ class BreedCard extends StatelessWidget {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          Theme.of(context).primaryColor.withOpacity(0.3),
-                          Theme.of(context).primaryColor.withOpacity(0.1),
+                          theme.colorScheme.surfaceVariant,
+                          theme.colorScheme.surface,
                         ],
                       ),
                     ),
@@ -47,24 +51,26 @@ class BreedCard extends StatelessWidget {
                             imageUrl: breed.images.first.url,
                             fit: BoxFit.cover,
                             placeholder: (context, url) => Container(
-                              color: Colors.grey[200],
-                              child: const Center(
-                                child: CircularProgressIndicator(),
+                              color: theme.colorScheme.surfaceVariant,
+                              child: Center(
+                                child: CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
+                                ),
                               ),
                             ),
                             errorWidget: (context, url, error) => Container(
-                              color: Colors.grey[200],
+                              color: theme.colorScheme.surfaceVariant,
                               child: Icon(
                                 Icons.pets,
                                 size: 48,
-                                color: Theme.of(context).primaryColor,
+                                color: theme.colorScheme.onSurfaceVariant,
                               ),
                             ),
                           )
                         : Icon(
                             Icons.pets,
                             size: 48,
-                            color: Theme.of(context).primaryColor,
+                            color: theme.colorScheme.onSurfaceVariant,
                           ),
                   ),
                   
@@ -74,17 +80,17 @@ class BreedCard extends StatelessWidget {
                       top: 8,
                       right: 8,
                       child: Container(
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.surface.withOpacity(0.8), // Slightly transparent surface
                           shape: BoxShape.circle,
                         ),
                         child: IconButton(
-                          icon: const Icon(Icons.favorite_border),
+                          icon: Icon(Icons.favorite_border, color: theme.colorScheme.primary),
                           onPressed: () {
                             // TODO: Toggle favorite
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('Added ${breed.name} to favorites'),
+                                content: Text('Added ${breed.name} to favorites (themed)'),
                                 duration: const Duration(seconds: 1),
                               ),
                             );
@@ -121,14 +127,14 @@ class BreedCard extends StatelessWidget {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).primaryColor.withOpacity(0.1),
+                          color: theme.colorScheme.primaryContainer,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
                           breed.origin,
                           style: TextStyle(
                             fontSize: 12,
-                            color: Theme.of(context).primaryColor,
+                            color: theme.colorScheme.onPrimaryContainer,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -141,8 +147,8 @@ class BreedCard extends StatelessWidget {
                   // Temperament Summary
                   Text(
                     breed.temperament.summary,
-                    style: const TextStyle(
-                      color: Colors.grey,
+                    style: TextStyle(
+                      color: theme.colorScheme.onSurface.withOpacity(0.7),
                       fontSize: 14,
                     ),
                     maxLines: 2,
@@ -185,12 +191,13 @@ class BreedCard extends StatelessWidget {
   Widget _buildInfoChip({
     required IconData icon,
     required String label,
-    required BuildContext context,
+    required BuildContext context, // context is already available via the build method, can remove if not changing per chip
   }) {
+    final theme = Theme.of(context); // Access theme here if needed, or pass as argument
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: theme.colorScheme.surfaceVariant,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -199,18 +206,18 @@ class BreedCard extends StatelessWidget {
           Icon(
             icon,
             size: 14,
-            color: Colors.grey[600],
+            color: theme.colorScheme.onSurfaceVariant,
           ),
           const SizedBox(width: 4),
           Text(
             label,
             style: TextStyle(
               fontSize: 12,
-              color: Colors.grey[600],
+              color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
         ],
       ),
     );
   }
-} 
+}

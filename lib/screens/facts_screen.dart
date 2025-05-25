@@ -118,11 +118,13 @@ class _FactsScreenState extends State<FactsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Cat Facts'),
-        backgroundColor: Theme.of(context).primaryColor,
-        foregroundColor: Colors.white,
+        // backgroundColor: theme.primaryColor, // Already set by theme
+        // foregroundColor: Colors.white, // Already set by theme
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -135,15 +137,16 @@ class _FactsScreenState extends State<FactsScreen> {
           // Category Filter
           Container(
             padding: const EdgeInsets.all(16),
-            color: Theme.of(context).primaryColor.withOpacity(0.1),
+            color: theme.colorScheme.surfaceVariant, // Updated background
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Categories',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.onSurfaceVariant, // Updated text color
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -159,15 +162,23 @@ class _FactsScreenState extends State<FactsScreen> {
                       return Padding(
                         padding: const EdgeInsets.only(right: 8),
                         child: FilterChip(
-                          label: Text(category),
+                          label: Text(
+                            category,
+                            style: TextStyle(
+                              color: isSelected 
+                                  ? theme.colorScheme.onPrimaryContainer 
+                                  : theme.colorScheme.onSurface,
+                            ),
+                          ),
                           selected: isSelected,
                           onSelected: (_) {
                             setState(() {
                               _selectedCategory = category;
                             });
                           },
-                          backgroundColor: Colors.white,
-                          selectedColor: Theme.of(context).primaryColor.withOpacity(0.2),
+                          backgroundColor: theme.chipTheme.backgroundColor ?? theme.colorScheme.surface,
+                          selectedColor: theme.chipTheme.selectedColor ?? theme.colorScheme.primaryContainer,
+                          checkmarkColor: isSelected ? theme.colorScheme.onPrimaryContainer : theme.colorScheme.onSurface,
                         ),
                       );
                     },
@@ -182,7 +193,7 @@ class _FactsScreenState extends State<FactsScreen> {
             Container(
               margin: const EdgeInsets.all(16),
               child: Card(
-                color: Theme.of(context).primaryColor.withOpacity(0.1),
+                color: theme.colorScheme.secondaryContainer, // Updated background
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
@@ -192,14 +203,15 @@ class _FactsScreenState extends State<FactsScreen> {
                         children: [
                           Icon(
                             Icons.star,
-                            color: Theme.of(context).primaryColor,
+                            color: theme.colorScheme.onSecondaryContainer, // Updated icon color
                           ),
                           const SizedBox(width: 8),
-                          const Text(
+                          Text(
                             'Fact of the Day',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
+                              color: theme.colorScheme.onSecondaryContainer, // Updated text color
                             ),
                           ),
                         ],
@@ -207,18 +219,27 @@ class _FactsScreenState extends State<FactsScreen> {
                       const SizedBox(height: 12),
                       Text(
                         _facts.first.factText,
-                        style: const TextStyle(fontSize: 16),
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: theme.colorScheme.onSecondaryContainer, // Updated text color
+                        ),
                       ),
                       const SizedBox(height: 8),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Chip(
-                            label: Text(_facts.first.category),
-                            backgroundColor: Theme.of(context).primaryColor.withOpacity(0.2),
+                            label: Text(
+                              _facts.first.category,
+                              style: TextStyle(color: theme.colorScheme.onTertiaryContainer),
+                            ),
+                            backgroundColor: theme.colorScheme.tertiaryContainer, // Updated chip background
                           ),
                           IconButton(
-                            icon: const Icon(Icons.share),
+                            icon: Icon(
+                              Icons.share,
+                              color: theme.colorScheme.onSecondaryContainer, // Updated icon color
+                            ),
                             onPressed: () {
                               // TODO: Share fact
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -238,16 +259,20 @@ class _FactsScreenState extends State<FactsScreen> {
           // Facts List
           Expanded(
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary)))
                 : _filteredFacts.isEmpty
-                    ? const Center(
+                    ? Center(
                         child: Text(
                           'No facts found for this category',
-                          style: TextStyle(fontSize: 18, color: Colors.grey),
+                          style: TextStyle(
+                            fontSize: 18, 
+                            color: theme.colorScheme.onBackground.withOpacity(0.6), // Updated text color
+                          ),
                         ),
                       )
                     : RefreshIndicator(
                         onRefresh: _loadFacts,
+                        color: theme.colorScheme.primary, // Refresh indicator color
                         child: ListView.builder(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           itemCount: _filteredFacts.length + 1,
@@ -259,6 +284,7 @@ class _FactsScreenState extends State<FactsScreen> {
                                 child: ElevatedButton(
                                   onPressed: _loadMoreFacts,
                                   child: const Text('Load More Facts'),
+                                  // Style button if needed, usually ElevatedButton adapts well
                                 ),
                               );
                             }
@@ -266,7 +292,7 @@ class _FactsScreenState extends State<FactsScreen> {
                             final fact = _filteredFacts[index];
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 12),
-                              child: FactCard(
+                              child: FactCard( // FactCard was already updated in a previous step
                                 fact: fact,
                                 onShare: () {
                                   // TODO: Share specific fact
@@ -297,7 +323,10 @@ class _FactsScreenState extends State<FactsScreen> {
         },
         icon: const Icon(Icons.quiz),
         label: const Text('Take Quiz'),
+        // Ensure FAB colors are good, typically handled by theme
+        // backgroundColor: theme.colorScheme.primary,
+        // foregroundColor: theme.colorScheme.onPrimary,
       ),
     );
   }
-} 
+}
