@@ -16,43 +16,34 @@ class FactCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final categoryStyle = _getCategoryStyle(fact.category, theme);
+    // The problematic line referencing _getCategoryStyle and fact.category is removed.
 
     return Card(
       elevation: 2,
-      // color: theme.cardColor, // Or rely on global card theme
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Fact Text
             Text(
-              fact.fact, // Changed from fact.factText
+              fact.fact,
               style: const TextStyle(
                 fontSize: 16,
                 height: 1.5,
               ),
             ),
-            
-            const SizedBox(height: 8), // Reduced spacing a bit
-
-            // Display Fact Length
+            const SizedBox(height: 8),
             Text(
               "Length: ${fact.length}",
               style: TextStyle(
                 fontSize: 12,
-                color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
+                color: theme.textTheme.bodySmall?.color?.withOpacity(0.7), // Using bodySmall as per previous version
               ),
             ),
-            
             const SizedBox(height: 12),
-            
-            // Bottom Row with Actions (Category Removed)
             Row(
-              mainAxisAlignment: MainAxisAlignment.end, // Align actions to the end
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                // Action Buttons
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -83,6 +74,4 @@ class FactCard extends StatelessWidget {
       ),
     );
   }
-
-  // _getCategoryStyle method and _CategoryStyle class are removed
 }
