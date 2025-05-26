@@ -4,47 +4,28 @@
 
 // @JsonSerializable()
 class CatFact {
-  final String id;
-  // @JsonKey(name: 'fact_text')
-  final String factText;
-  final String category;
-  // @JsonKey(name: 'source_url')
-  final String? sourceUrl;
-  // @JsonKey(name: 'date_added')
-  final DateTime dateAdded;
+  final String fact;
+  final int length;
 
   const CatFact({
-    required this.id,
-    required this.factText,
-    required this.category,
-    this.sourceUrl,
-    required this.dateAdded,
+    required this.fact,
+    required this.length,
   });
 
-  // factory CatFact.fromJson(Map<String, dynamic> json) => _$CatFactFromJson(json);
-  // Map<String, dynamic> toJson() => _$CatFactToJson(this);
+  // Add a fromJson factory method for parsing
+  factory CatFact.fromJson(Map<String, dynamic> json) {
+    return CatFact(
+      fact: json['fact'] as String,
+      length: json['length'] as int,
+    );
+  }
+
+  // Add a toJson method (optional, but good practice)
+  // Map<String, dynamic> toJson() => _$CatFactToJson(this); // If using build_runner
+   Map<String, dynamic> toJson() { // Manual implementation
+    return {
+      'fact': fact,
+      'length': length,
+    };
+  }
 }
-
-// @JsonSerializable()
-class CatQuizQuestion {
-  final String id;
-  final String question;
-  final List<String> options;
-  // @JsonKey(name: 'correct_option_index')
-  final int correctOptionIndex;
-  final String explanation;
-  final String? category;
-
-  const CatQuizQuestion({
-    required this.id,
-    required this.question,
-    required this.options,
-    required this.correctOptionIndex,
-    required this.explanation,
-    this.category,
-  });
-
-  // factory CatQuizQuestion.fromJson(Map<String, dynamic> json) => 
-  //     _$CatQuizQuestionFromJson(json);
-  // Map<String, dynamic> toJson() => _$CatQuizQuestionToJson(this);
-} 

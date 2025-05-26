@@ -5,7 +5,10 @@ import '../models/cat_fact.dart';
 
 class ApiService {
   static const String _catApiBaseUrl = 'https://api.thecatapi.com/v1';
-  static const String _catFactsApiUrl = 'https://meowfacts.herokuapp.com';
+  static const String _catFactsApiUrl = 'https://meowfacts.herokuapp.com'; // Kept for reference, but fetchRandomFacts will change
+  static const String _catNinjaFactUrl = 'https://catfact.ninja/fact';
+  static const String _catNinjaFactsListUrl = 'https://catfact.ninja/facts';
+  static const String _catNinjaBreedsUrl = 'https://catfact.ninja/breeds'; // New URL
   
   final Dio _dio;
 
@@ -35,6 +38,24 @@ class ApiService {
       return [];
     } on DioException catch (e) {
       throw ApiException('Failed to fetch breeds: ${e.message}');
+    }
+  }
+
+  // New method for cat breeds from catfact.ninja
+  Future<List<CatBreed>> fetchCatBreeds({int limit = 1000}) async {
+    try {
+      final response = await Dio().get(
+        _catNinjaBreedsUrl,
+        queryParameters: {'limit': limit},
+      );
+      // The API returns pagination data, but 'data' contains the list of breeds
+      final List<dynamic> breedsJson = response.data['data']; 
+      final List<CatBreed> breeds = breedsJson.map((json) => CatBreed.fromJson(json)).toList();
+      return breeds;
+    } on DioException catch (e) {
+      throw ApiException('Failed to fetch cat breeds: ${e.message}');
+    } catch (e) {
+      throw ApiException('An unexpected error occurred while fetching cat breeds: $e');
     }
   }
 
@@ -87,25 +108,68 @@ class ApiService {
 
   // Fetch random cat facts
   Future<List<CatFact>> fetchRandomFacts({int count = 1}) async {
+    // This method will now primarily fetch one random fact using the new ninja API.
+    // For multiple facts, the FactsScreen will use fetchNinjaFactsList directly.
+    if (count <= 0) {
+      return []; // Or throw an argument error
+    }
+    try {
+      // For simplicity, if count is 1, fetch a single fact.
+      // If count > 1, the issue implies the main list will use fetchNinjaFactsList.
+      // This method can be simplified to always fetch one, or adapted.
+      // Let's stick to the plan: if count is 1, call fetchNinjaFact.
+      // If count > 1, call fetchNinjaFactsList.
+      if (count == 1) {
+        final fact = await fetchNinjaFact();
+        return [fact];
+      } else {
+        // Fetching multiple "random" facts isn't directly supported by a single endpoint that guarantees randomness for each.
+        // catfact.ninja/facts provides a list, but it's paginated, not purely random items for a given count.
+        // For now, let's fetch 'count' facts from the first page of the list.
+        final result = await fetchNinjaFactsList(limit: count, page: 1);
+        return result['facts'] as List<CatFact>;
+      }
+    } on ApiException { // Re-throw if it's already an ApiException
+      rethrow;
+    } catch (e) { // Catch other potential errors
+      throw ApiException('Failed to fetch random facts: ${e.toString()}');
+    }
+  }
+
+  // New method for a single fact from catfact.ninja
+  Future<CatFact> fetchNinjaFact() async {
+    try {
+      final response = await Dio().get(_catNinjaFactUrl); // Use a new Dio instance or a configured one
+      return CatFact.fromJson(response.data);
+    } on DioException catch (e) {
+      throw ApiException('Failed to fetch ninja fact: ${e.message}');
+    } catch (e) {
+      throw ApiException('An unexpected error occurred while fetching ninja fact: $e');
+    }
+  }
+
+  // New method for a list of facts from catfact.ninja
+  Future<Map<String, dynamic>> fetchNinjaFactsList({int page = 1, int limit = 10}) async {
     try {
       final response = await Dio().get(
-        '$_catFactsApiUrl/?count=$count',
+        _catNinjaFactsListUrl,
+        queryParameters: {'page': page, 'limit': limit},
       );
-      
       final List<dynamic> factsJson = response.data['data'];
-      return factsJson.asMap().entries.map((entry) {
-        final index = entry.key;
-        final factText = entry.value as String;
-        
-        return CatFact(
-          id: 'fact_${DateTime.now().millisecondsSinceEpoch}_$index',
-          factText: factText,
-          category: 'General',
-          dateAdded: DateTime.now(),
-        );
-      }).toList();
+      final List<CatFact> facts = factsJson.map((json) => CatFact.fromJson(json)).toList();
+      
+      // Prepare pagination data (extract what's needed)
+      final paginationData = Map<String, dynamic>.from(response.data);
+      paginationData.remove('data'); // Remove the facts list itself from pagination data
+
+      return {
+        'facts': facts,
+        'pagination': paginationData,
+      };
     } on DioException catch (e) {
-      throw ApiException('Failed to fetch cat facts: ${e.message}');
+      throw ApiException('Failed to fetch ninja facts list: ${e.message}');
+    } catch (e) {
+      throw ApiException('An unexpected error occurred while fetching ninja facts list: $e');
     }
   }
 

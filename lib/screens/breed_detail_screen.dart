@@ -1,132 +1,66 @@
+// lib/screens/breed_detail_screen.dart
 import 'package:flutter/material.dart';
 import '../models/cat_breed.dart';
 
 class BreedDetailScreen extends StatelessWidget {
   final CatBreed breed;
 
-  const BreedDetailScreen({
-    super.key,
-    required this.breed,
-  });
+  const BreedDetailScreen({super.key, required this.breed});
+
+  Widget _buildDetailItem(BuildContext context, String label, String value) {
+    final String displayValue = value.isNotEmpty ? value : "N/A";
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  fontWeight: FontWeight.bold, // Make label bold
+                ),
+          ),
+          const SizedBox(height: 4), // Increased spacing slightly
+          Text(
+            displayValue,
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                // Example: Add a bit more style to the value if needed
+                // color: Theme.of(context).colorScheme.onSurface,
+                ),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(breed.name),
-        backgroundColor: Theme.of(context).primaryColor,
-        foregroundColor: Colors.white,
+        title: Text(breed.breed), // AppBar title remains the breed name
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Hero Image
-            Container(
-              height: 200,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                Icons.pets,
-                size: 64,
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
-            
-            const SizedBox(height: 16),
-            
-            // Basic Info
-            Text(
-              breed.name,
-              style: const TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            
-            const SizedBox(height: 8),
-            
-            Text(
-              'Origin: ${breed.origin}',
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
-            ),
-            
-            const SizedBox(height: 16),
-            
-            // Temperament
-            const Text(
-              'Temperament',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            
-            const SizedBox(height: 8),
-            
-            Text(
-              breed.temperament.summary,
-              style: const TextStyle(fontSize: 16),
-            ),
-            
-            const SizedBox(height: 16),
-            
-            // History
-            const Text(
-              'History',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            
-            const SizedBox(height: 8),
-            
-            Text(
-              breed.history,
-              style: const TextStyle(fontSize: 16),
-            ),
-            
-            const SizedBox(height: 24),
-            
-            // Action Buttons
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Added ${breed.name} to favorites')),
-                      );
-                    },
-                    icon: const Icon(Icons.favorite),
-                    label: const Text('Add to Favorites'),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Sharing breed info...')),
-                      );
-                    },
-                    icon: const Icon(Icons.share),
-                    label: const Text('Share'),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+      body: ListView(
+        padding: const EdgeInsets.all(16.0),
+        children: <Widget>[
+          // Display Breed name prominently at the top if not just in AppBar
+          // This is optional as AppBar already has it.
+          // Padding(
+          //   padding: const EdgeInsets.only(bottom: 16.0),
+          //   child: Text(
+          //     breed.breed,
+          //     style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+          //   ),
+          // ),
+          _buildDetailItem(context, 'Country', breed.country),
+          const Divider(), // Add dividers for better separation
+          _buildDetailItem(context, 'Origin', breed.origin),
+          const Divider(),
+          _buildDetailItem(context, 'Coat', breed.coat),
+          const Divider(),
+          _buildDetailItem(context, 'Pattern', breed.pattern),
+        ],
       ),
     );
   }
-} 
+}
