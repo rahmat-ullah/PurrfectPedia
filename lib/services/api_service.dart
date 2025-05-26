@@ -8,6 +8,7 @@ class ApiService {
   static const String _catFactsApiUrl = 'https://meowfacts.herokuapp.com'; // Kept for reference, but fetchRandomFacts will change
   static const String _catNinjaFactUrl = 'https://catfact.ninja/fact';
   static const String _catNinjaFactsListUrl = 'https://catfact.ninja/facts';
+  static const String _catNinjaBreedsUrl = 'https://catfact.ninja/breeds'; // New URL
   
   final Dio _dio;
 
@@ -37,6 +38,24 @@ class ApiService {
       return [];
     } on DioException catch (e) {
       throw ApiException('Failed to fetch breeds: ${e.message}');
+    }
+  }
+
+  // New method for cat breeds from catfact.ninja
+  Future<List<CatBreed>> fetchCatBreeds({int limit = 1000}) async {
+    try {
+      final response = await Dio().get(
+        _catNinjaBreedsUrl,
+        queryParameters: {'limit': limit},
+      );
+      // The API returns pagination data, but 'data' contains the list of breeds
+      final List<dynamic> breedsJson = response.data['data']; 
+      final List<CatBreed> breeds = breedsJson.map((json) => CatBreed.fromJson(json)).toList();
+      return breeds;
+    } on DioException catch (e) {
+      throw ApiException('Failed to fetch cat breeds: ${e.message}');
+    } catch (e) {
+      throw ApiException('An unexpected error occurred while fetching cat breeds: $e');
     }
   }
 
