@@ -28,39 +28,30 @@ class FactCard extends StatelessWidget {
           children: [
             // Fact Text
             Text(
-              fact.factText,
+              fact.fact, // Changed from fact.factText
               style: const TextStyle(
                 fontSize: 16,
                 height: 1.5,
               ),
             ),
             
+            const SizedBox(height: 8), // Reduced spacing a bit
+
+            // Display Fact Length
+            Text(
+              "Length: ${fact.length}",
+              style: TextStyle(
+                fontSize: 12,
+                color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
+              ),
+            ),
+            
             const SizedBox(height: 12),
             
-            // Bottom Row with Category and Actions
+            // Bottom Row with Actions (Category Removed)
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.end, // Align actions to the end
               children: [
-                // Category Chip
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: categoryStyle.backgroundColor,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Text(
-                    fact.category,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: categoryStyle.textColor,
-                    ),
-                  ),
-                ),
-                
                 // Action Buttons
                 Row(
                   mainAxisSize: MainAxisSize.min,
@@ -93,41 +84,5 @@ class FactCard extends StatelessWidget {
     );
   }
 
-  _CategoryStyle _getCategoryStyle(String category, ThemeData theme) {
-    switch (category.toLowerCase()) {
-      case 'health':
-        return _CategoryStyle(
-          backgroundColor: theme.colorScheme.errorContainer,
-          textColor: theme.colorScheme.onErrorContainer,
-        );
-      case 'behavior':
-        return _CategoryStyle(
-          backgroundColor: theme.colorScheme.tertiaryContainer,
-          textColor: theme.colorScheme.onTertiaryContainer,
-        );
-      case 'history':
-        return _CategoryStyle(
-          backgroundColor: theme.colorScheme.secondaryContainer,
-          textColor: theme.colorScheme.onSecondaryContainer,
-        );
-      case 'fun':
-        return _CategoryStyle(
-          backgroundColor: theme.colorScheme.primaryContainer, // Example, adjust as needed
-          textColor: theme.colorScheme.onPrimaryContainer,
-        );
-      case 'general':
-      default:
-        return _CategoryStyle(
-          backgroundColor: theme.colorScheme.surfaceVariant,
-          textColor: theme.colorScheme.onSurfaceVariant,
-        );
-    }
-  }
-}
-
-class _CategoryStyle {
-  final Color backgroundColor;
-  final Color textColor;
-
-  _CategoryStyle({required this.backgroundColor, required this.textColor});
+  // _getCategoryStyle method and _CategoryStyle class are removed
 }
