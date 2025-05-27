@@ -5,7 +5,7 @@ import '../models/cat_fact.dart';
 
 class ApiService {
   static const String _catApiBaseUrl = 'https://api.thecatapi.com/v1';
-  static const String _catFactsApiUrl = 'https://meowfacts.herokuapp.com';
+  static const String _catFactsApiUrl = 'https://catfact.ninja';
   
   final Dio _dio;
 
@@ -14,7 +14,6 @@ class ApiService {
     _dio.options.connectTimeout = const Duration(seconds: 10);
     _dio.options.receiveTimeout = const Duration(seconds: 10);
     
-    // Add interceptors for logging and error handling
     _dio.interceptors.add(LogInterceptor(
       requestBody: true,
       responseBody: true,
@@ -122,6 +121,57 @@ class ApiService {
       throw ApiException('Failed to upload image: ${e.message}');
     }
   }
+
+  // Fetch single random cat fact from catfact.ninja
+  Future<CatFact> fetchRandomFact() async {
+    try {
+      final response = await Dio().get('$_catFactsApiUrl/fact');
+      
+      return CatFact(
+        id: 'fact_${DateTime.now().millisecondsSinceEpoch}',
+        factText: response.data['fact'],
+        category: 'General',
+        dateAdded: DateTime.now(),
+      );
+    } on DioException catch (e) {
+      throw ApiException('Failed to fetch random cat fact: ${e.message}');
+    }
+  }
+
+  // Fetch paginated cat facts from catfact.ninja
+  Future<Map<String, dynamic>> fetchFactsList({int page = 1, int limit = 10}) async {
+    try {
+      final response = await Dio().get(
+        '$_catFactsApiUrl/facts',
+        queryParameters: {
+          'page': page,
+          'limit': limit,
+        },
+      );
+      
+      final data = response.data;
+      final List<dynamic> factsJson = data['data'];
+      
+      final facts = factsJson.map((factData) {
+        return CatFact(
+          id: 'fact_${DateTime.now().millisecondsSinceEpoch}_${factData['fact'].hashCode}',
+          factText: factData['fact'],
+          category: 'General',
+          dateAdded: DateTime.now(),
+        );
+      }).toList();
+      
+      return {
+        'facts': facts,
+        'currentPage': data['current_page'],
+        'lastPage': data['last_page'],
+        'total': data['total'],
+        'hasNextPage': data['current_page'] < data['last_page'],
+      };
+    } on DioException catch (e) {
+      throw ApiException('Failed to fetch cat facts list: ${e.message}');
+    }
+  }
 }
 
 class ApiException implements Exception {
@@ -131,4 +181,4 @@ class ApiException implements Exception {
   
   @override
   String toString() => 'ApiException: $message';
-} 
+}

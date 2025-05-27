@@ -5,12 +5,14 @@ class FactCard extends StatelessWidget {
   final CatFact fact;
   final VoidCallback? onShare;
   final VoidCallback? onFavorite;
+  final bool isFavorite;
 
   const FactCard({
     super.key,
     required this.fact,
     this.onShare,
     this.onFavorite,
+    this.isFavorite = false,
   });
 
   @override
@@ -20,7 +22,6 @@ class FactCard extends StatelessWidget {
 
     return Card(
       elevation: 2,
-      // color: theme.cardColor, // Or rely on global card theme
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -68,8 +69,10 @@ class FactCard extends StatelessWidget {
                     if (onFavorite != null)
                       IconButton(
                         icon: Icon(
-                          Icons.favorite_border,
-                          color: theme.iconTheme.color ?? theme.colorScheme.onSurface.withOpacity(0.7),
+                          isFavorite ? Icons.favorite : Icons.favorite_border,
+                          color: isFavorite 
+                              ? Colors.red 
+                              : theme.iconTheme.color ?? theme.colorScheme.onSurface.withOpacity(0.7),
                         ),
                         onPressed: onFavorite,
                         iconSize: 20,
@@ -112,7 +115,12 @@ class FactCard extends StatelessWidget {
         );
       case 'fun':
         return _CategoryStyle(
-          backgroundColor: theme.colorScheme.primaryContainer, // Example, adjust as needed
+          backgroundColor: theme.colorScheme.primaryContainer,
+          textColor: theme.colorScheme.onPrimaryContainer,
+        );
+      case 'daily':
+        return _CategoryStyle(
+          backgroundColor: theme.colorScheme.primaryContainer,
           textColor: theme.colorScheme.onPrimaryContainer,
         );
       case 'general':
