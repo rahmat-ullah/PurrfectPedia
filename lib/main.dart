@@ -157,15 +157,7 @@ class PurrfectPediaApp extends StatelessWidget {
         '/onboarding1': (context) => const OnboardingScreen1(),
         '/onboarding2': (context) => const OnboardingScreen2(),
       },
-      // TODO: DEVELOPMENT ONLY - BYPASS LOGIN
-      // The following line directly loads HomeScreen to bypass authentication during development.
-      // Make sure to REMOVE this line and UNCOMMENT the StreamBuilder logic below
-      // before releasing the app to production.
-      home: const HomeScreen(),
-
-      /*
-      // ORIGINAL AUTHENTICATION AND ONBOARDING LOGIC:
-      // UNCOMMENT THIS BLOCK FOR PRODUCTION
+      // PRODUCTION AUTHENTICATION AND ONBOARDING LOGIC
       home: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
@@ -195,7 +187,6 @@ class PurrfectPediaApp extends StatelessWidget {
           }
         },
       ),
-      */
     );
   }
 }

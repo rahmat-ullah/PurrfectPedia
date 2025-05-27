@@ -61,19 +61,9 @@ class _AuthScreenState extends State<AuthScreen> { // Created State class
                         print('Email: ${userCredential.user!.email}');
                         print('Is new user: $isNewUser');
 
-                        if (!context.mounted) return; // Check context before navigation
-
-                        if (isNewUser) {
-                          final OnboardingService onboardingService = OnboardingService();
-                          final bool hasCompletedOnboarding = await onboardingService.isOnboardingComplete();
-                          if (!hasCompletedOnboarding) {
-                            Navigator.pushReplacementNamed(context, '/onboarding1');
-                          } else {
-                            Navigator.pushReplacementNamed(context, '/home');
-                          }
-                        } else {
-                          Navigator.pushReplacementNamed(context, '/home');
-                        }
+                        // Don't manually navigate - let main.dart's StreamBuilder handle it
+                        // The auth state change will automatically trigger the proper navigation
+                        
                       } else {
                         print('Google Sign-In failed: UserCredential or user is null.');
                         // TODO: Show error message to user
@@ -149,8 +139,8 @@ class _AuthScreenState extends State<AuthScreen> { // Created State class
                     final UserCredential? userCredential = await _authService.signInWithMasterCredentials(email, password);
                     if (userCredential != null && userCredential.user != null) {
                       print('Master user signed in: ${userCredential.user!.email}');
-                      if (!context.mounted) return; // Check context before navigation
-                      Navigator.pushReplacementNamed(context, '/home'); // Navigate to home
+                      // Don't manually navigate - let main.dart's StreamBuilder handle it
+                      // The auth state change will automatically trigger the proper navigation
                     } else {
                       // Error is already printed in AuthService
                       print('Master login failed in AuthScreen.');
