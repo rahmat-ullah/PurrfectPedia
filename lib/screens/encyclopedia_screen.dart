@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import '../models/cat_breed.dart';
-import '../services/api_service.dart';
-import '../widgets/breed_card.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import '../models/breed.dart';
+import '../services/breed_service.dart';
+import '../widgets/breed_thumbnail_card.dart';
 import '../widgets/search_bar_widget.dart';
 import 'breed_detail_screen.dart';
 
@@ -14,21 +14,24 @@ class EncyclopediaScreen extends StatefulWidget {
 }
 
 class _EncyclopediaScreenState extends State<EncyclopediaScreen> {
-  final ApiService _apiService = ApiService();
-  List<CatBreed> _breeds = [];
-  List<CatBreed> _filteredBreeds = [];
+  List<Breed> _breeds = [];
+  List<Breed> _filteredBreeds = [];
   bool _isLoading = true;
   String _searchQuery = '';
   String _selectedFilter = 'All';
+  List<String> _favoriteBreeds = [];
 
   final List<String> _filterOptions = [
     'All',
-    'Natural',
-    'Hybrid',
-    'Mutation',
+    'Purebred',
+    'Cross Breed',
     'Large',
     'Medium',
     'Small',
+    'Long Hair',
+    'Short Hair',
+    'Child Friendly',
+    'Dog Friendly',
   ];
 
   @override
@@ -43,11 +46,11 @@ class _EncyclopediaScreenState extends State<EncyclopediaScreen> {
         _isLoading = true;
       });
 
-      // For now, create mock data since we don't have real API integration
-      _breeds = _createMockBreeds();
-      _filteredBreeds = _breeds;
-
+      final breeds = await BreedService.getAllBreeds();
+      
       setState(() {
+        _breeds = breeds;
+        _filteredBreeds = breeds;
         _isLoading = false;
       });
     } catch (e) {
@@ -61,69 +64,6 @@ class _EncyclopediaScreenState extends State<EncyclopediaScreen> {
         );
       }
     }
-  }
-
-  List<CatBreed> _createMockBreeds() {
-    return [
-      CatBreed(
-        id: 'maine_coon',
-        name: 'Maine Coon',
-        aliases: ['Coon Cat', 'Maine Shag'],
-        origin: 'United States',
-        breedGroup: 'Natural',
-        recognition: [
-          const BreedRecognition(organization: 'TICA', status: 'recognized'),
-          const BreedRecognition(organization: 'CFA', status: 'recognized'),
-        ],
-        history: 'The Maine Coon originated in the US state of Maine...',
-        appearance: const Appearance(
-          bodyType: 'Large, muscular, rectangular',
-          weightRange: '5.9–8.2 kg (13–18 lbs)',
-          averageHeight: '25–41 cm',
-          coatLength: 'Long',
-          coatColors: ['Brown Tabby', 'Black', 'White', 'Various'],
-          eyeColors: ['Green', 'Gold', 'Copper'],
-          distinctiveFeatures: ['Tufted ears', 'Bushy tail', 'Large paws'],
-        ),
-        temperament: const Temperament(
-          summary: 'Gentle, playful, intelligent, and social',
-          activityLevel: 'Medium',
-          vocalizationLevel: 'Moderate',
-          affectionLevel: 'High',
-          intelligence: 'High',
-          socialWithKids: true,
-          socialWithDogs: true,
-          socialWithCats: true,
-          trainability: 'High',
-        ),
-        care: const Care(
-          groomingNeeds: 'Moderate (weekly brushing)',
-          shedding: 'Moderate',
-          exerciseNeeds: 'Moderate (daily play recommended)',
-          dietaryNotes: 'No special dietary needs',
-        ),
-        health: const Health(
-          lifespan: '12–15 years',
-          commonIssues: ['Hypertrophic Cardiomyopathy', 'Hip Dysplasia'],
-          geneticTests: ['HCM DNA Test', 'SMA DNA Test'],
-          veterinaryRecommendations: 'Annual health check-ups',
-        ),
-        breedStandardLinks: [],
-        funFacts: [
-          'The Maine Coon is one of the largest domesticated cat breeds.',
-          'Known as "gentle giants" due to their size and friendly nature.',
-        ],
-        images: [
-          const MediaItem(url: 'https://example.com/maine-coon1.jpg', caption: 'Classic Maine Coon'),
-        ],
-        videos: [],
-        adoptionResources: [],
-        relatedBreeds: ['Norwegian Forest Cat', 'Siberian'],
-        status: 'Extant',
-        lastUpdated: DateTime.now(),
-      ),
-      // Add more mock breeds here...
-    ];
   }
 
   void _onSearchChanged(String query) {
@@ -140,46 +80,131 @@ class _EncyclopediaScreenState extends State<EncyclopediaScreen> {
     });
   }
 
-  void _filterBreeds() {
-    _filteredBreeds = _breeds.where((breed) {
-      final matchesSearch = _searchQuery.isEmpty ||
-          breed.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          breed.origin.toLowerCase().contains(_searchQuery.toLowerCase());
+  Future<void> _filterBreeds() async {
+    List<Breed> filtered = [];
 
-      final matchesFilter = _selectedFilter == 'All' ||
-          breed.breedGroup.toLowerCase() == _selectedFilter.toLowerCase() ||
-          (_selectedFilter == 'Large' && breed.appearance.weightRange.contains('8')) ||
-          (_selectedFilter == 'Medium' && breed.appearance.weightRange.contains('5')) ||
-          (_selectedFilter == 'Small' && breed.appearance.weightRange.contains('3'));
+    switch (_selectedFilter) {
+      case 'All':
+        filtered = await BreedService.searchBreeds(_searchQuery);
+        break;
+      case 'Purebred':
+        filtered = await BreedService.filterBreeds(
+          isCrossbreed: false,
+        );
+        break;
+      case 'Cross Breed':
+        filtered = await BreedService.filterBreeds(
+          isCrossbreed: true,
+        );
+        break;
+      case 'Large':
+        filtered = await BreedService.getBreedsBySize('Large');
+        break;
+      case 'Medium':
+        filtered = await BreedService.getBreedsBySize('Medium');
+        break;
+      case 'Small':
+        filtered = await BreedService.getBreedsBySize('Small');
+        break;
+      case 'Long Hair':
+        filtered = await BreedService.getBreedsByCoatLength('Long');
+        break;
+      case 'Short Hair':
+        filtered = await BreedService.getBreedsByCoatLength('Short');
+        break;
+      case 'Child Friendly':
+        filtered = await BreedService.getChildFriendlyBreeds();
+        break;
+      case 'Dog Friendly':
+        filtered = await BreedService.getDogFriendlyBreeds();
+        break;
+      default:
+        filtered = _breeds;
+    }
 
-      return matchesSearch && matchesFilter;
-    }).toList();
+    // Apply search query if any
+    if (_searchQuery.isNotEmpty && _selectedFilter != 'All') {
+      final lowercaseQuery = _searchQuery.toLowerCase();
+      filtered = filtered.where((breed) {
+        return breed.name.toLowerCase().contains(lowercaseQuery) ||
+               breed.origin.toLowerCase().contains(lowercaseQuery) ||
+               breed.aliases.any((alias) => alias.toLowerCase().contains(lowercaseQuery)) ||
+               breed.temperament.traits.any((trait) => trait.toLowerCase().contains(lowercaseQuery));
+      }).toList();
+    }
+
+    setState(() {
+      _filteredBreeds = filtered;
+    });
+  }
+
+  void _toggleFavorite(String breedId) {
+    setState(() {
+      if (_favoriteBreeds.contains(breedId)) {
+        _favoriteBreeds.remove(breedId);
+      } else {
+        _favoriteBreeds.add(breedId);
+      }
+    });
+  }
+
+  void _navigateToBreedDetail(Breed breed) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BreedDetailScreen(breed: breed),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context); // Get theme data
+    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Cat Encyclopedia'),
-        // backgroundColor: theme.primaryColor, // Already set by theme
-        // foregroundColor: Colors.white, // Already set by theme
+        title: Row(
+          children: [
+            Icon(
+              Icons.pets,
+              color: theme.colorScheme.onPrimary,
+            ),
+            const SizedBox(width: 8),
+            const Text('PurrfectPedia'),
+          ],
+        ),
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _loadBreeds,
+          ),
+        ],
       ),
       body: Column(
         children: [
           // Search and Filter Section
           Container(
             padding: const EdgeInsets.all(16),
-            color: theme.colorScheme.surfaceVariant, // Updated background
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface,
+              boxShadow: [
+                BoxShadow(
+                  color: theme.shadowColor.withOpacity(0.1),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
             child: Column(
               children: [
                 SearchBarWidget(
                   onSearchChanged: _onSearchChanged,
-                  hintText: 'Search breeds...',
+                  hintText: 'Search breeds, origins, or traits...',
                 ),
                 const SizedBox(height: 12),
+                
+                // Filter Chips
                 SizedBox(
                   height: 40,
                   child: ListView.builder(
@@ -192,67 +217,86 @@ class _EncyclopediaScreenState extends State<EncyclopediaScreen> {
                       return Padding(
                         padding: const EdgeInsets.only(right: 8),
                         child: FilterChip(
-                          label: Text(
-                            filter,
-                            style: TextStyle(
-                              color: isSelected 
-                                  ? theme.colorScheme.onPrimaryContainer 
-                                  : theme.colorScheme.onSurface,
-                            ),
-                          ),
+                          label: Text(filter),
                           selected: isSelected,
-                          onSelected: (_) => _onFilterChanged(filter),
-                          backgroundColor: theme.chipTheme.backgroundColor ?? theme.colorScheme.surface,
-                          selectedColor: theme.chipTheme.selectedColor ?? theme.colorScheme.primaryContainer,
-                          // Ensure checkmark color is appropriate if default is not visible
-                          checkmarkColor: isSelected ? theme.colorScheme.onPrimaryContainer : theme.colorScheme.onSurface,
+                          onSelected: (selected) {
+                            _onFilterChanged(filter);
+                          },
+                          backgroundColor: theme.colorScheme.surface,
+                          selectedColor: theme.colorScheme.primaryContainer,
+                          labelStyle: TextStyle(
+                            color: isSelected 
+                                ? theme.colorScheme.onPrimaryContainer 
+                                : theme.colorScheme.onSurface,
+                          ),
                         ),
                       );
                     },
+                  ),
+                ),
+                
+                // Breed count
+                const SizedBox(height: 8),
+                Text(
+                  '${_filteredBreeds.length} breeds found',
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    fontSize: 14,
                   ),
                 ),
               ],
             ),
           ),
           
-          // Breeds List
+          // Breeds Grid
           Expanded(
             child: _isLoading
-                ? Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary)))
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
                 : _filteredBreeds.isEmpty
                     ? Center(
-                        child: Text(
-                          'No breeds found',
-                          style: TextStyle(
-                            fontSize: 18, 
-                            color: theme.colorScheme.onBackground.withOpacity(0.6), // Updated text color
-                          ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.search_off,
+                              size: 64,
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'No breeds found',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Try adjusting your search or filters',
+                              style: TextStyle(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
                         ),
                       )
-                    : RefreshIndicator(
-                        onRefresh: _loadBreeds,
-                        color: theme.colorScheme.primary, // Refresh indicator color
-                        child: ListView.builder(
-                          padding: const EdgeInsets.all(16),
-                          itemCount: _filteredBreeds.length,
-                          itemBuilder: (context, index) {
-                            final breed = _filteredBreeds[index];
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 12),
-                              child: BreedCard(
-                                breed: breed,
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => BreedDetailScreen(breed: breed),
-                                    ),
-                                  );
-                                },
-                              ),
-                            );
-                          },
-                        ),
+                    : MasonryGridView.count(
+                        crossAxisCount: 1,
+                        mainAxisSpacing: 8,
+                        crossAxisSpacing: 8,
+                        padding: const EdgeInsets.all(16),
+                        itemCount: _filteredBreeds.length,
+                        itemBuilder: (context, index) {
+                          final breed = _filteredBreeds[index];
+                          return BreedThumbnailCard(
+                            breed: breed,
+                            isFavorite: _favoriteBreeds.contains(breed.id),
+                            onTap: () => _navigateToBreedDetail(breed),
+                            onFavoriteToggle: () => _toggleFavorite(breed.id),
+                          );
+                        },
                       ),
           ),
         ],

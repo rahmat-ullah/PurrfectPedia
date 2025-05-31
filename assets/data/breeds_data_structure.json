@@ -1,0 +1,217 @@
+{
+    "id": "maine_coon",
+    "name": "Maine Coon",
+    "aliases": ["Coon Cat", "Maine Shag"],
+    "origin": "United States",
+    "breed_group": "Natural",
+    "is_crossbreed": true,
+    "crossbreed_info": {
+      "parent_breeds": ["Asian Leopard Cat", "Domestic Shorthair"],
+      "parent_breed_ids": ["asian_leopard_cat", "domestic_shorthair"],
+      "parent_breed_images": [
+        {
+          "breed_id": "asian_leopard_cat",
+          "breed_name": "Asian Leopard Cat",
+          "images": [
+            {
+              "url": "https://example.com/asian-leopard-cat1.jpg",
+              "caption": "Asian Leopard Cat - Primary parent",
+              "image_type": "profile"
+            },
+            {
+              "url": "https://example.com/asian-leopard-cat2.jpg", 
+              "caption": "Asian Leopard Cat spotted pattern",
+              "image_type": "coat_detail"
+            }
+          ]
+        },
+        {
+          "breed_id": "domestic_shorthair",
+          "breed_name": "Domestic Shorthair",
+          "images": [
+            {
+              "url": "https://example.com/domestic-shorthair1.jpg",
+              "caption": "Domestic Shorthair - Secondary parent",
+              "image_type": "profile"
+            },
+            {
+              "url": "https://example.com/domestic-shorthair2.jpg",
+              "caption": "Domestic Shorthair temperament",
+              "image_type": "behavioral"
+            }
+          ]
+        }
+      ],
+      "generation": "F4+",
+      "primary_parent": "Asian Leopard Cat",
+      "primary_parent_id": "asian_leopard_cat",
+      "secondary_parent": "Domestic Shorthair",
+      "secondary_parent_id": "domestic_shorthair",
+      "breeding_purpose": "Create domestic cat with wild appearance",
+      "first_developed": "1960s-1980s",
+      "inheritance_patterns": {
+        "coat_from": "Primary parent (spotted pattern from Asian Leopard Cat)",
+        "size_from": "Both parents (medium to large size)",
+        "temperament_from": "Mostly secondary parent (domestic traits preferred)",
+        "health_considerations": [
+          "May inherit wild parent sensitivities",
+          "Hybrid sterility in early generations (F1-F3 males)"
+        ]
+      },
+      "hybrid_vigor": {
+        "present": true,
+        "benefits": [
+          "Enhanced disease resistance",
+          "Robust constitution",
+          "Unique aesthetic traits"
+        ],
+        "potential_issues": [
+          "Behavioral unpredictability in early generations",
+          "Digestive sensitivities",
+          "Higher energy requirements"
+        ]
+      },
+      "breed_stability": "Established (consistent traits after F4 generation)",
+      "recognition_challenges": [
+        "Some organizations don't recognize wild hybrid crosses",
+        "Requires multiple generations to achieve recognition",
+        "Legal restrictions in some jurisdictions"
+      ]
+    },
+    "recognition": [
+      {"organization": "TICA", "status": "recognized"},
+      {"organization": "CFA", "status": "recognized"},
+      {"organization": "FIFe", "status": "recognized"}
+    ],
+    "history": "The Maine Coon originated in the US state of Maine. It is one of the oldest natural breeds in North America and is known for its size, intelligence, and sociable nature.",
+    "appearance": {
+      "body_type": "Large, muscular, rectangular",
+      "weight_range": "5.9–8.2 kg (13–18 lbs)",
+      "average_height": "25–41 cm",
+      "coat_length": "Long",
+      "coat": "Long, heavy double coat",
+      "coat_colors": ["Brown Tabby", "Black", "White", "Blue", "Red", "Various"],
+      "colors": "Various (brown tabby, black, white, blue, red, etc.)",
+      "eye_colors": ["Green", "Gold", "Copper"],
+      "size": "Large",
+      "distinctive_features": ["Tufted ears", "Bushy tail", "Large paws"],
+      "distinct_features": ["Tufted ears", "Bushy tail", "Lynx-like ear tips"]
+    },
+    "temperament": {
+      "summary": "Gentle, playful, intelligent, and social. Good with children and other pets.",
+      "traits": ["Friendly", "Gentle", "Playful", "Intelligent"],
+      "activity_level": "Medium",
+      "vocalization_level": "Moderate",
+      "affection_level": "High",
+      "intelligence": "High",
+      "social_with_kids": true,
+      "social_with_dogs": true,
+      "social_with_cats": true,
+      "trainability": "High"
+    },
+    "care": {
+      "grooming_needs": "Moderate (weekly brushing)",
+      "grooming": "Brush 2-3 times per week (more during shedding seasons)",
+      "shedding": "Moderate",
+      "exercise_needs": "Moderate (daily play recommended)",
+      "exercise": "Provide daily play (Maine Coons are active and enjoy interactive toys)",
+      "dietary_notes": "No special dietary needs",
+      "nutrition": "High-protein diet; monitor portions to prevent obesity"
+    },
+    "health": {
+      "lifespan": "12–15 years",
+      "common_issues": [
+        "Hypertrophic Cardiomyopathy",
+        "Hip Dysplasia",
+        "Spinal Muscular Atrophy"
+      ],
+      "genetic_tests": ["HCM DNA Test", "SMA DNA Test"],
+      "veterinary_recommendations": "Annual health check-ups, heart screening",
+      "vaccinations": "Core vaccines (FVRCP, rabies) per vet schedule; FeLV vaccine if at risk"
+    },
+    "common_medications": [
+      {
+        "name": "Flea & Tick Preventative",
+        "purpose": "Prevents flea and tick infestations",
+        "usage_notes": "Apply topically once a month"
+      },
+      {
+        "name": "Broad-Spectrum Dewormer",
+        "purpose": "Eliminates common intestinal parasites (worms)",
+        "usage_notes": "Administer every 3 months or as advised by a veterinarian"
+      },
+      {
+        "name": "Heartworm Preventative",
+        "purpose": "Prevents heartworm disease",
+        "usage_notes": "Give monthly (oral chewable) in heartworm-endemic areas"
+      },
+      {
+        "name": "Joint Supplement",
+        "purpose": "Supports joint health (for large breeds prone to hip issues)",
+        "usage_notes": "Mix with food daily, as recommended by the vet"
+      }
+    ],
+    "veterinary_care_recommendations": {
+      "deworming_schedule": "Every 3 months for adults (more frequently for kittens)",
+      "vaccinations": "Annual core vaccines (FVRCP, rabies); FeLV vaccination if outdoor",
+      "dental_care": "Brush teeth weekly; consider annual professional dental cleaning",
+      "parasite_prevention": "Year-round flea, tick, and heartworm prevention is advised",
+      "special_screenings": "Cardiac ultrasound after age 3-4 to screen for HCM (breed predisposition)"
+    },
+    "breeding_compatibility": {
+      "compatible_breeds": ["Norwegian Forest Cat", "Siberian"],
+      "genetic_precautions": [
+        "Perform DNA tests for HCM and SMA genes before breeding",
+        "Avoid close inbreeding to maintain genetic diversity",
+        "Ensure parents have healthy hips to reduce risk of dysplasia in kittens"
+      ]
+    },
+    "typical_litter_size": {
+      "min": 1,
+      "max": 6,
+      "average": 4
+    },
+    "gestation_period_days": {
+      "min": 63,
+      "max": 70,
+      "average": 65
+    },
+    "reproductive_maturity_age": {
+      "male_months": 10,
+      "female_months": 8
+    },
+    "life_span_years": {
+      "min": 10,
+      "max": 15,
+      "average": 13
+    },
+    "weight_range_lbs": {
+      "male": "13-18",
+      "female": "8-12"
+    },
+    "other_traits": "Known as the 'gentle giants' of the cat world; often enjoy water and have a soft chirping voice",
+    "breed_standard_links": [
+      {"organization": "TICA", "url": "https://tica.org/maine-coon"},
+      {"organization": "CFA", "url": "https://cfa.org/maine-coon/"},
+      {"organization": "FIFe", "url": "http://fifeweb.org/wp/breeds/breeds_prf_stn.php"}
+    ],
+    "fun_facts": [
+      "The Maine Coon is one of the largest domesticated cat breeds.",
+      "Known as 'gentle giants' due to their size and friendly nature."
+    ],
+    "images": [
+      {"url": "https://example.com/maine-coon1.jpg", "caption": "Classic Maine Coon"},
+      {"url": "https://example.com/maine-coon2.jpg", "caption": "Brown tabby Maine Coon"}
+    ],
+    "videos": [
+      {"url": "https://youtube.com/mainecoon_intro", "caption": "Maine Coon breed overview"}
+    ],
+    "adoption_resources": [
+      {"name": "Maine Coon Rescue", "url": "https://mainecoonrescue.net"},
+      {"name": "Petfinder", "url": "https://www.petfinder.com/cat-breeds/maine-coon"}
+    ],
+    "related_breeds": ["Norwegian Forest Cat", "Siberian"],
+    "status": "Extant",
+    "last_updated": "2024-05-17T00:00:00Z"
+}
+  
