@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dashboard_screen.dart';
 import 'encyclopedia_screen.dart';
 import 'recognition_screen.dart';
 import 'facts_screen.dart';
@@ -12,11 +13,12 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _currentIndex = 0;
+  int _currentIndex = 2; // Start with Home (center position)
 
   final List<Widget> _screens = [
     const EncyclopediaScreen(),
     const RecognitionScreen(),
+    const DashboardScreen(), // New home dashboard
     const FactsScreen(),
     const ProfileScreen(),
   ];
@@ -36,22 +38,38 @@ class _HomeScreenState extends State<HomeScreen> {
             _currentIndex = index;
           });
         },
-        selectedItemColor: Theme.of(context).primaryColor,
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(
+        // Remove hardcoded colors to use theme configuration
+        // selectedItemColor and unselectedItemColor will be inherited from BottomNavigationBarTheme
+        items: [
+          const BottomNavigationBarItem(
             icon: Icon(Icons.book),
             label: 'Encyclopedia',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.camera_alt),
             label: 'Recognition',
           ),
           BottomNavigationBarItem(
+            icon: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: _currentIndex == 2
+                    ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.2)
+                    : Colors.transparent,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.home,
+                size: _currentIndex == 2 ? 28 : 24,
+              ),
+            ),
+            label: 'Home',
+          ),
+          const BottomNavigationBarItem(
             icon: Icon(Icons.lightbulb),
             label: 'Facts',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Profile',
           ),

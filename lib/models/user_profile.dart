@@ -1,8 +1,8 @@
-// import 'package:json_annotation/json_annotation.dart';
+import 'package:json_annotation/json_annotation.dart';
 
-// part 'user_profile.g.dart';
+part 'user_profile.g.dart';
 
-// @JsonSerializable()
+@JsonSerializable()
 class UserProfile {
   // @JsonKey(name: 'user_id')
   final String userId;
@@ -37,9 +37,9 @@ class UserProfile {
     required this.lastUpdated,
   });
 
-  // factory UserProfile.fromJson(Map<String, dynamic> json) => 
-  //     _$UserProfileFromJson(json);
-  // Map<String, dynamic> toJson() => _$UserProfileToJson(this);
+  factory UserProfile.fromJson(Map<String, dynamic> json) =>
+      _$UserProfileFromJson(json);
+  Map<String, dynamic> toJson() => _$UserProfileToJson(this);
 
   UserProfile copyWith({
     String? userId,

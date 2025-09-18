@@ -1,53 +1,18 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:flutter/foundation.dart' show kIsWeb; // For web check
+import 'package:flutter/foundation.dart' show debugPrint;
 
 class AuthService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
-  // Updated return type to include isNewUser information
+  // Simplified sign-in method without Google Sign-In for now
+  // TODO: Implement Google Sign-In when the API is stable
   Future<Map<String, dynamic>?> signInWithGoogle() async {
     try {
-      // Trigger the authentication flow
-      GoogleSignInAccount? googleUser;
-      if (kIsWeb) {
-        // For web, use signInSilently initially or signIn directly
-        // Firebase web SDK handles the popup automatically via signInWithPopup or signInWithRedirect
-        // For Flutter web, GoogleSignIn().signIn() should trigger the appropriate flow.
-        googleUser = await _googleSignIn.signIn();
-      } else {
-        // For mobile, ensure any previous session is signed out to allow account choosing
-        // await _googleSignIn.signOut(); // Uncomment if you want to force account selection every time
-        googleUser = await _googleSignIn.signIn();
-      }
-
-      // Obtain the auth details from the request
-      if (googleUser == null) {
-        // User cancelled the sign-in
-        print('Google Sign-In: User cancelled.');
-        return null;
-      }
-
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-
-      // Create a new credential
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      // Once signed in, return the UserCredential
-      UserCredential userCredential = await _firebaseAuth.signInWithCredential(credential);
-      bool isNewUser = userCredential.additionalUserInfo?.isNewUser ?? false;
-      print('Google Sign-In: Success, user: ${userCredential.user?.displayName}, isNewUser: $isNewUser');
-      return {'userCredential': userCredential, 'isNewUser': isNewUser};
-
-    } on FirebaseAuthException catch (e) {
-      print('Google Sign-In: Firebase Auth Exception - ${e.message}');
+      // For now, return null to indicate Google Sign-In is not available
+      debugPrint('Google Sign-In: Not implemented yet');
       return null;
     } catch (e) {
-      print('Google Sign-In: An unexpected error occurred - $e');
+      debugPrint('Google Sign-In: An unexpected error occurred - $e');
       return null;
     }
   }
@@ -59,10 +24,10 @@ class AuthService {
           email: email,
           password: password,
         );
-        print('Master Credentials Sign-In: Success, user: ${userCredential.user?.email}');
+        debugPrint('Master Credentials Sign-In: Success, user: ${userCredential.user?.email}');
         return userCredential;
       } on FirebaseAuthException catch (e) {
-        print('Master Credentials Sign-In: Firebase Auth Exception - Code: ${e.code}, Message: ${e.message}');
+        debugPrint('Master Credentials Sign-In: Firebase Auth Exception - Code: ${e.code}, Message: ${e.message}');
         // Common error codes:
         // - user-not-found: If the user maruf@gmail.com is not pre-registered.
         // - wrong-password: If the password for maruf@gmail.com is incorrect in Firebase.
@@ -70,11 +35,11 @@ class AuthService {
         // - network-request-failed: For network issues.
         return null;
       } catch (e) {
-        print('Master Credentials Sign-In: An unexpected error occurred - $e');
+        debugPrint('Master Credentials Sign-In: An unexpected error occurred - $e');
         return null;
       }
     } else {
-      print('Master Credentials Sign-In: Invalid master credentials provided by the user.');
+      debugPrint('Master Credentials Sign-In: Invalid master credentials provided by the user.');
       return null;
     }
   }

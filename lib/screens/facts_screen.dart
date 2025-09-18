@@ -76,13 +76,31 @@ class _FactsScreenState extends State<FactsScreen> with TickerProviderStateMixin
       }
 
       // If no cached fact or expired, fetch new one
-      final fact = await _apiService.fetchRandomFact();
-      await _cacheService.cacheDailyFact(fact);
-      
-      setState(() {
-        _dailyFact = fact;
-        _isDailyFactLoading = false;
-      });
+      final result = await _apiService.fetchRandomFact();
+
+      result.when(
+        success: (fact) async {
+          await _cacheService.cacheDailyFact(fact);
+          setState(() {
+            _dailyFact = fact;
+            _isDailyFactLoading = false;
+          });
+        },
+        onError: (error) {
+          setState(() {
+            _isDailyFactLoading = false;
+          });
+          // Show error to user
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Failed to load daily fact: ${error.message}')),
+            );
+          }
+        },
+        loading: () {
+          // This shouldn't happen in this context
+        },
+      );
     } catch (e) {
       setState(() {
         _isDailyFactLoading = false;
@@ -212,13 +230,31 @@ class _FactsScreenState extends State<FactsScreen> with TickerProviderStateMixin
       }
 
       // Fetch new random fact
-      final fact = await _apiService.fetchRandomFact();
-      await _cacheService.cacheRandomFact(fact);
-      
-      setState(() {
-        _randomFact = fact;
-        _isRandomFactLoading = false;
-      });
+      final result = await _apiService.fetchRandomFact();
+
+      result.when(
+        success: (fact) async {
+          await _cacheService.cacheRandomFact(fact);
+          setState(() {
+            _randomFact = fact;
+            _isRandomFactLoading = false;
+          });
+        },
+        onError: (error) {
+          setState(() {
+            _isRandomFactLoading = false;
+          });
+          // Show error to user
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Failed to load random fact: ${error.message}')),
+            );
+          }
+        },
+        loading: () {
+          // This shouldn't happen in this context
+        },
+      );
     } catch (e) {
       setState(() {
         _isRandomFactLoading = false;

@@ -1,7 +1,7 @@
-import 'dart:convert';
 import 'package:dio/dio.dart';
-import '../models/cat_breed.dart';
+import '../models/simple_cat_breed.dart';
 import '../models/cat_fact.dart';
+import '../utils/result.dart';
 
 class ApiService {
   static const String _catApiBaseUrl = 'https://api.thecatapi.com/v1';
@@ -22,49 +22,63 @@ class ApiService {
   }
 
   // Fetch all cat breeds
-  Future<List<CatBreed>> fetchBreeds() async {
+  Future<Result<List<SimpleCatBreed>>> fetchBreeds() async {
     try {
       final response = await _dio.get('/breeds');
       final List<dynamic> breedsJson = response.data;
-      
-      // TODO: Implement proper JSON parsing when serialization is enabled
-      // return breedsJson.map((json) => CatBreed.fromJson(json)).toList();
-      
-      // For now, return empty list
-      return [];
+
+      // Now with working JSON serialization
+      final breeds = breedsJson.map((json) => SimpleCatBreed.fromJson(json)).toList();
+      return Result.success(breeds);
     } on DioException catch (e) {
-      throw ApiException('Failed to fetch breeds: ${e.message}');
+      return Result.error(_handleDioException(e, 'Failed to fetch breeds'));
+    } catch (e, stackTrace) {
+      return Result.error(AppError(
+        message: 'Unexpected error while fetching breeds: $e',
+        originalError: e,
+        stackTrace: stackTrace,
+      ));
     }
   }
 
   // Fetch breed by ID
-  Future<CatBreed?> fetchBreedById(String breedId) async {
+  Future<Result<SimpleCatBreed?>> fetchBreedById(String breedId) async {
     try {
       final response = await _dio.get('/breeds/$breedId');
-      // TODO: Implement proper JSON parsing when serialization is enabled
-      // return CatBreed.fromJson(response.data);
-      return null;
+      final breed = SimpleCatBreed.fromJson(response.data);
+      return Result.success(breed);
     } on DioException catch (e) {
       if (e.response?.statusCode == 404) {
-        return null;
+        return Result.success(null);
       }
-      throw ApiException('Failed to fetch breed: ${e.message}');
+      return Result.error(_handleDioException(e, 'Failed to fetch breed'));
+    } catch (e, stackTrace) {
+      return Result.error(AppError(
+        message: 'Unexpected error while fetching breed: $e',
+        originalError: e,
+        stackTrace: stackTrace,
+      ));
     }
   }
 
   // Search breeds by name
-  Future<List<CatBreed>> searchBreeds(String query) async {
+  Future<Result<List<SimpleCatBreed>>> searchBreeds(String query) async {
     try {
       final response = await _dio.get('/breeds/search', queryParameters: {
         'q': query,
       });
       final List<dynamic> breedsJson = response.data;
-      
-      // TODO: Implement proper JSON parsing when serialization is enabled
-      // return breedsJson.map((json) => CatBreed.fromJson(json)).toList();
-      return [];
+
+      final breeds = breedsJson.map((json) => SimpleCatBreed.fromJson(json)).toList();
+      return Result.success(breeds);
     } on DioException catch (e) {
-      throw ApiException('Failed to search breeds: ${e.message}');
+      return Result.error(_handleDioException(e, 'Failed to search breeds'));
+    } catch (e, stackTrace) {
+      return Result.error(AppError(
+        message: 'Unexpected error while searching breeds: $e',
+        originalError: e,
+        stackTrace: stackTrace,
+      ));
     }
   }
 
@@ -123,18 +137,25 @@ class ApiService {
   }
 
   // Fetch single random cat fact from catfact.ninja
-  Future<CatFact> fetchRandomFact() async {
+  Future<Result<CatFact>> fetchRandomFact() async {
     try {
       final response = await Dio().get('$_catFactsApiUrl/fact');
-      
-      return CatFact(
+
+      final fact = CatFact(
         id: 'fact_${DateTime.now().millisecondsSinceEpoch}',
         factText: response.data['fact'],
         category: 'General',
         dateAdded: DateTime.now(),
       );
+      return Result.success(fact);
     } on DioException catch (e) {
-      throw ApiException('Failed to fetch random cat fact: ${e.message}');
+      return Result.error(_handleDioException(e, 'Failed to fetch random cat fact'));
+    } catch (e, stackTrace) {
+      return Result.error(AppError(
+        message: 'Unexpected error while fetching random fact: $e',
+        originalError: e,
+        stackTrace: stackTrace,
+      ));
     }
   }
 
@@ -170,6 +191,47 @@ class ApiService {
       };
     } on DioException catch (e) {
       throw ApiException('Failed to fetch cat facts list: ${e.message}');
+    }
+  }
+
+  // Helper method to convert DioException to AppError
+  AppError _handleDioException(DioException e, String context) {
+    switch (e.type) {
+      case DioExceptionType.connectionTimeout:
+      case DioExceptionType.sendTimeout:
+      case DioExceptionType.receiveTimeout:
+        return NetworkError(
+          message: '$context: Connection timeout',
+          code: 'TIMEOUT',
+          originalError: e,
+        );
+      case DioExceptionType.connectionError:
+        return NetworkError(
+          message: '$context: No internet connection',
+          code: 'NO_CONNECTION',
+          originalError: e,
+        );
+      case DioExceptionType.badResponse:
+        final statusCode = e.response?.statusCode;
+        return ApiError(
+          message: '$context: Server error (${statusCode ?? 'Unknown'})',
+          code: 'SERVER_ERROR',
+          statusCode: statusCode,
+          originalError: e,
+        );
+      case DioExceptionType.cancel:
+        return AppError(
+          message: '$context: Request was cancelled',
+          code: 'CANCELLED',
+          originalError: e,
+        );
+      case DioExceptionType.unknown:
+      default:
+        return AppError(
+          message: '$context: ${e.message ?? 'Unknown error'}',
+          code: 'UNKNOWN',
+          originalError: e,
+        );
     }
   }
 }

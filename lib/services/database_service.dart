@@ -5,11 +5,12 @@ import '../models/cat_breed.dart';
 import '../models/cat_fact.dart';
 import '../models/cat_recognition_result.dart';
 import '../models/user_profile.dart';
+import '../models/saved_breed.dart';
 
 class DatabaseService {
   static Database? _database;
   static const String _databaseName = 'purrfect_pedia.db';
-  static const int _databaseVersion = 1;
+  static const int _databaseVersion = 3;
 
   // Table names
   static const String _breedsTable = 'breeds';
@@ -17,6 +18,8 @@ class DatabaseService {
   static const String _recognitionResultsTable = 'recognition_results';
   static const String _userProfileTable = 'user_profile';
   static const String _favoritesTable = 'favorites';
+  static const String _savedBreedsTable = 'saved_breeds';
+  static const String _recognitionHistoryTable = 'recognition_history';
 
   Future<Database> get database async {
     if (_database != null) return _database!;
@@ -85,10 +88,73 @@ class DatabaseService {
         UNIQUE(user_id, item_id, item_type)
       )
     ''');
+
+    // Create saved breeds table
+    await db.execute('''
+      CREATE TABLE $_savedBreedsTable (
+        id TEXT PRIMARY KEY,
+        breed_id TEXT NOT NULL,
+        breed_name TEXT NOT NULL,
+        confidence REAL NOT NULL,
+        image_url TEXT,
+        saved_date INTEGER NOT NULL,
+        recognition_id TEXT NOT NULL,
+        notes TEXT
+      )
+    ''');
+
+    // Create recognition history table
+    await db.execute('''
+      CREATE TABLE $_recognitionHistoryTable (
+        id TEXT PRIMARY KEY,
+        image_url TEXT NOT NULL,
+        recognition_date INTEGER NOT NULL,
+        was_successful INTEGER NOT NULL,
+        breeds_detected INTEGER NOT NULL DEFAULT 0,
+        highest_confidence REAL,
+        top_breed_name TEXT,
+        result_data TEXT,
+        notes TEXT
+      )
+    ''');
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     // Handle database upgrades here
+    if (oldVersion < 2) {
+      // Add notes column to recognition_history table
+      try {
+        await db.execute('ALTER TABLE $_recognitionHistoryTable ADD COLUMN notes TEXT');
+        print('Successfully added notes column to recognition_history table');
+      } catch (e) {
+        print('Error adding notes column (may already exist): $e');
+        // Column might already exist, continue
+      }
+    }
+
+    if (oldVersion < 3) {
+      // Add missing columns to saved_breeds table
+      try {
+        await db.execute('ALTER TABLE $_savedBreedsTable ADD COLUMN breed_id TEXT');
+        print('Successfully added breed_id column to saved_breeds table');
+      } catch (e) {
+        print('Error adding breed_id column (may already exist): $e');
+      }
+
+      try {
+        await db.execute('ALTER TABLE $_savedBreedsTable ADD COLUMN recognition_id TEXT');
+        print('Successfully added recognition_id column to saved_breeds table');
+      } catch (e) {
+        print('Error adding recognition_id column (may already exist): $e');
+      }
+
+      try {
+        await db.execute('ALTER TABLE $_savedBreedsTable ADD COLUMN notes TEXT');
+        print('Successfully added notes column to saved_breeds table');
+      } catch (e) {
+        print('Error adding notes column to saved_breeds table (may already exist): $e');
+      }
+    }
   }
 
   // Breed operations

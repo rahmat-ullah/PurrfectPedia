@@ -19,7 +19,7 @@ class _EncyclopediaScreenState extends State<EncyclopediaScreen> {
   bool _isLoading = true;
   String _searchQuery = '';
   String _selectedFilter = 'All';
-  List<String> _favoriteBreeds = [];
+  final List<String> _favoriteBreeds = [];
 
   final List<String> _filterOptions = [
     'All',

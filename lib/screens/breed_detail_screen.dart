@@ -19,7 +19,7 @@ class BreedDetailScreen extends StatefulWidget {
 class _BreedDetailScreenState extends State<BreedDetailScreen>
     with TickerProviderStateMixin {
   late TabController _tabController;
-  PageController _imageController = PageController();
+  final PageController _imageController = PageController();
   int _currentImageIndex = 0;
   bool _isFavorite = false;
 
@@ -277,10 +277,22 @@ class _BreedDetailScreenState extends State<BreedDetailScreen>
                     runSpacing: 8,
                     children: widget.breed.recognition.map((recognition) {
                       return Chip(
-                        label: Text('${recognition.organization}: ${recognition.status}'),
-                        backgroundColor: recognition.status == 'recognized' 
-                            ? Colors.green[100] 
-                            : Colors.orange[100],
+                        label: Text(
+                          '${recognition.organization}: ${recognition.status}',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        backgroundColor: recognition.status == 'recognized'
+                            ? Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.2) // Success color with transparency
+                            : Theme.of(context).colorScheme.secondary.withValues(alpha: 0.2), // Secondary accent with transparency
+                        side: BorderSide(
+                          color: recognition.status == 'recognized'
+                              ? Theme.of(context).colorScheme.tertiary // Success/Positive - Cyan
+                              : Theme.of(context).colorScheme.secondary, // Secondary Accent - Soft indigo
+                          width: 1,
+                        ),
                       );
                     }).toList(),
                   ),
@@ -429,8 +441,18 @@ class _BreedDetailScreenState extends State<BreedDetailScreen>
                     runSpacing: 8,
                     children: widget.breed.appearance.coatColors.map((color) {
                       return Chip(
-                        label: Text(color),
-                        backgroundColor: Colors.blue[50],
+                        label: Text(
+                          color,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        backgroundColor: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
+                        side: BorderSide(
+                          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+                          width: 1,
+                        ),
                       );
                     }).toList(),
                   ),
@@ -461,8 +483,18 @@ class _BreedDetailScreenState extends State<BreedDetailScreen>
                     runSpacing: 8,
                     children: widget.breed.appearance.eyeColors.map((color) {
                       return Chip(
-                        label: Text(color),
-                        backgroundColor: Colors.amber[50],
+                        label: Text(
+                          color,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        backgroundColor: Theme.of(context).colorScheme.tertiaryContainer.withValues(alpha: 0.3),
+                        side: BorderSide(
+                          color: Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.7),
+                          width: 1,
+                        ),
                       );
                     }).toList(),
                   ),
@@ -583,8 +615,18 @@ class _BreedDetailScreenState extends State<BreedDetailScreen>
                     runSpacing: 8,
                     children: widget.breed.temperament.traits.map((trait) {
                       return Chip(
-                        label: Text(trait),
-                        backgroundColor: Colors.green[50],
+                        label: Text(
+                          trait,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        backgroundColor: Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.2),
+                        side: BorderSide(
+                          color: Theme.of(context).colorScheme.tertiary,
+                          width: 1,
+                        ),
                       );
                     }).toList(),
                   ),
@@ -914,8 +956,18 @@ class _BreedDetailScreenState extends State<BreedDetailScreen>
                       runSpacing: 8,
                       children: widget.breed.breedingCompatibility!.compatibleBreeds.map((breed) {
                         return Chip(
-                          label: Text(breed),
-                          backgroundColor: Colors.green[50],
+                          label: Text(
+                            breed,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          backgroundColor: Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.2),
+                          side: BorderSide(
+                            color: Theme.of(context).colorScheme.tertiary,
+                            width: 1,
+                          ),
                         );
                       }).toList(),
                     ),
@@ -1177,9 +1229,9 @@ class _BreedDetailScreenState extends State<BreedDetailScreen>
           const SizedBox(height: 4),
           LinearProgressIndicator(
             value: value,
-            backgroundColor: Colors.grey[300],
+            backgroundColor: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
             valueColor: AlwaysStoppedAnimation<Color>(
-              Theme.of(context).primaryColor,
+              Theme.of(context).colorScheme.primary,
             ),
           ),
         ],

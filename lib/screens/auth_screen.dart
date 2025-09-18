@@ -124,7 +124,6 @@ class _AuthScreenState extends State<AuthScreen> { // Created State class
 
               // Login Button
               ElevatedButton(
-                child: const Text('Login'),
                 onPressed: () async { // Made onPressed async
                   final String email = _emailController.text.trim();
                   final String password = _passwordController.text.trim();
@@ -154,6 +153,7 @@ class _AuthScreenState extends State<AuthScreen> { // Created State class
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 50), // Full width button
                 ),
+                child: const Text('Login'),
               ),
               const SizedBox(height: 12),
 

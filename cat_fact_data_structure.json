@@ -1,0 +1,36 @@
+{
+    "id": "fact_001",                
+    "text": "Cats have five toes on their front paws, but only four on the back paws.", 
+    "translations": [                
+      {
+        "language": "es",
+        "text": "Los gatos tienen cinco dedos en las patas delanteras, pero solo cuatro en las traseras."
+      },
+      {
+        "language": "bn",
+        "text": "বিড়ালের সামনের পায়ে পাঁচটি এবং পেছনের পায়ে চারটি আঙুল থাকে।"
+      }
+    ],
+    "category": "anatomy",           
+    "tags": ["paws", "toes", "anatomy"],
+    "source": {
+      "type": "website",
+      "name": "National Geographic",
+      "url": "https://www.nationalgeographic.com/animals/article/cat-facts"
+    },
+    "verified": true,                
+    "added_by": "admin",             
+    "date_added": "2024-05-31",
+    "last_updated": "2024-05-31",
+    "references": [
+      {
+        "title": "Cat Anatomy 101",
+        "url": "https://www.catster.com/cat-health-care/cat-anatomy-facts"
+      }
+    ],
+    "image": {
+      "url": "https://example.com/images/cat-paws.jpg",
+      "caption": "A close-up of a cat's paws showing five toes on the front paw."
+    }
+  }
+  

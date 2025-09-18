@@ -5,26 +5,54 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:purrfect_pedia/main.dart';
+import 'package:purrfect_pedia/models/simple_cat_breed.dart';
+import 'package:purrfect_pedia/models/cat_fact.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  group('JSON Serialization Tests', () {
+    test('SimpleCatBreed JSON serialization works', () {
+      final breed = SimpleCatBreed(
+        id: 'test_breed',
+        name: 'Test Breed',
+        aliases: ['Test Cat'],
+        origin: 'Test Country',
+        breedGroup: 'Test Group',
+        history: 'Test history',
+        funFacts: ['Test fact'],
+        relatedBreeds: ['Related breed'],
+        status: 'Active',
+        lastUpdated: DateTime.now(),
+      );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+      // Test toJson
+      final json = breed.toJson();
+      expect(json['id'], equals('test_breed'));
+      expect(json['name'], equals('Test Breed'));
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+      // Test fromJson
+      final breedFromJson = SimpleCatBreed.fromJson(json);
+      expect(breedFromJson.id, equals(breed.id));
+      expect(breedFromJson.name, equals(breed.name));
+    });
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    test('CatFact JSON serialization works', () {
+      final fact = CatFact(
+        id: 'test_fact',
+        factText: 'Test fact text',
+        category: 'Test',
+        dateAdded: DateTime.now(),
+      );
+
+      // Test toJson
+      final json = fact.toJson();
+      expect(json['id'], equals('test_fact'));
+      expect(json['factText'], equals('Test fact text'));
+
+      // Test fromJson
+      final factFromJson = CatFact.fromJson(json);
+      expect(factFromJson.id, equals(fact.id));
+      expect(factFromJson.factText, equals(fact.factText));
+    });
   });
 }

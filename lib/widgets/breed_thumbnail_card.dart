@@ -9,12 +9,12 @@ class BreedThumbnailCard extends StatelessWidget {
   final bool isFavorite;
 
   const BreedThumbnailCard({
-    Key? key,
+    super.key,
     required this.breed,
     this.onTap,
     this.onFavoriteToggle,
     this.isFavorite = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +37,7 @@ class BreedThumbnailCard extends StatelessWidget {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(12),
-                    child: Container(
+                    child: SizedBox(
                       height: 180,
                       width: double.infinity,
                       child: breed.images.isNotEmpty

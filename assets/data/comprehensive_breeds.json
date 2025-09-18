@@ -1,0 +1,138 @@
+[
+  {
+    "id": "maine_coon",
+    "name": "Maine Coon",
+    "aliases": ["Coon Cat", "Maine Shag", "American Longhair"],
+    "origin": "United States",
+    "breed_group": "Natural",
+    "is_crossbreed": false,
+    "crossbreed_info": null,
+    "recognition": [
+      {"organization": "TICA", "status": "recognized"},
+      {"organization": "CFA", "status": "recognized"},
+      {"organization": "FIFe", "status": "recognized"}
+    ],
+    "history": "The Maine Coon is America's native longhaired cat and one of the oldest natural breeds in North America. Generally regarded as a native of the state of Maine, where it was made the official state cat in 1985. The breed developed through natural selection in the harsh New England climate, creating a hardy, handsome breed well equipped to survive hostile winters.",
+    "appearance": {
+      "body_type": "Large, muscular, rectangular",
+      "weight_range": "13-18 lbs (males), 8-12 lbs (females)",
+      "average_height": "25-41 cm",
+      "coat_length": "Long",
+      "coat": "Long, heavy double coat",
+      "coat_colors": ["Brown Tabby", "Black", "White", "Blue", "Red", "Silver", "Tortoiseshell"],
+      "colors": "Various (brown tabby, black, white, blue, red, etc.)",
+      "eye_colors": ["Green", "Gold", "Copper"],
+      "size": "Large",
+      "distinctive_features": ["Tufted ears", "Bushy tail", "Large paws", "Lynx-like ear tips"],
+      "distinct_features": ["Tufted ears", "Bushy tail", "Lynx-like ear tips"]
+    },
+    "temperament": {
+      "summary": "Sweet-tempered, gentle, friendly, and social. They have a clown-like personality and are willing to 'help' their owners, yet aren't demanding of attention. They make excellent companions for large, active families and get along well with children, dogs, and other cats.",
+      "traits": ["Friendly", "Gentle", "Playful", "Intelligent", "Social", "Loyal"],
+      "activity_level": "Medium",
+      "vocalization_level": "Low",
+      "affection_level": "High",
+      "intelligence": "High",
+      "social_with_kids": true,
+      "social_with_dogs": true,
+      "social_with_cats": true,
+      "trainability": "High"
+    },
+    "care": {
+      "grooming_needs": "Moderate (weekly brushing)",
+      "grooming": "Weekly combing is usually sufficient to keep coat in top condition",
+      "shedding": "Moderate",
+      "exercise_needs": "Moderate (daily play recommended)",
+      "exercise": "Interactive toys provide exercise and bonding time; many play fetch",
+      "dietary_notes": "High-quality diet; monitor portions to prevent obesity",
+      "nutrition": "High-protein diet; monitor portions to prevent obesity"
+    },
+    "health": {
+      "lifespan": "12.5+ years",
+      "common_issues": [
+        "Hypertrophic Cardiomyopathy",
+        "Hip Dysplasia",
+        "Spinal Muscular Atrophy"
+      ],
+      "genetic_tests": ["HCM DNA Test", "SMA DNA Test"],
+      "veterinary_recommendations": "Annual health check-ups, heart screening",
+      "vaccinations": "Core vaccines (FVRCP, rabies) per vet schedule"
+    },
+    "common_medications": [
+      {
+        "name": "Flea & Tick Preventative",
+        "purpose": "Prevents flea and tick infestations",
+        "usage_notes": "Apply topically once a month"
+      },
+      {
+        "name": "Joint Supplement",
+        "purpose": "Supports joint health for large breeds",
+        "usage_notes": "Mix with food daily, as recommended by vet"
+      }
+    ],
+    "veterinary_care_recommendations": {
+      "deworming_schedule": "Every 3 months for adults",
+      "vaccinations": "Annual core vaccines",
+      "dental_care": "Brush teeth weekly",
+      "parasite_prevention": "Year-round flea, tick, and heartworm prevention",
+      "special_screenings": "Cardiac ultrasound after age 3-4 to screen for HCM"
+    },
+    "breeding_compatibility": {
+      "compatible_breeds": ["Norwegian Forest Cat", "Siberian"],
+      "genetic_precautions": [
+        "Perform DNA tests for HCM and SMA genes before breeding",
+        "Avoid close inbreeding to maintain genetic diversity"
+      ]
+    },
+    "typical_litter_size": {
+      "min": 1,
+      "max": 6,
+      "average": 4
+    },
+    "gestation_period_days": {
+      "min": 63,
+      "max": 70,
+      "average": 65
+    },
+    "reproductive_maturity_age": {
+      "male_months": 10,
+      "female_months": 8
+    },
+    "life_span_years": {
+      "min": 10,
+      "max": 15,
+      "average": 13
+    },
+    "weight_range_lbs": {
+      "male": "13-18",
+      "female": "8-12"
+    },
+    "other_traits": "Known as the 'gentle giants' of the cat world; often enjoy water and have a soft chirping voice",
+    "breed_standard_links": [
+      {"organization": "TICA", "url": "https://tica.org/maine-coon"},
+      {"organization": "CFA", "url": "https://cfa.org/maine-coon/"}
+    ],
+    "fun_facts": [
+      "Maine Coons are the only native longhaired American breed among pedigreed cats",
+      "They often chirp and trill rather than meow to communicate",
+      "Some Maine Coons have six toes (polydactyls) recognized by TICA",
+      "Most Maine Coons actually like water and are good swimmers",
+      "They don't reach full maturity until 4 years of age",
+      "Known as 'gentle giants' due to their size and friendly nature"
+    ],
+    "images": [
+      {"url": "https://example.com/maine-coon1.jpg", "caption": "Classic Maine Coon"},
+      {"url": "https://example.com/maine-coon2.jpg", "caption": "Brown tabby Maine Coon"}
+    ],
+    "videos": [
+      {"url": "https://youtube.com/mainecoon_intro", "caption": "Maine Coon breed overview"}
+    ],
+    "adoption_resources": [
+      {"name": "Maine Coon Rescue", "url": "https://mainecoonrescue.net"},
+      {"name": "Petfinder", "url": "https://www.petfinder.com/cat-breeds/maine-coon"}
+    ],
+    "related_breeds": ["Norwegian Forest Cat", "Siberian"],
+    "status": "Extant",
+    "last_updated": "2024-12-18T00:00:00Z"
+  }
+]

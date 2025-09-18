@@ -12,7 +12,7 @@ dependencies {
 
 android {
     namespace = "com.mixfution.purrfectpedia"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 36
     ndkVersion = "27.0.12077973"
 
     compileOptions {

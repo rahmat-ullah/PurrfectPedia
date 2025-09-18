@@ -2,8 +2,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../models/cat_recognition_result.dart';
+import '../models/saved_breed.dart';
 import '../services/recognition_service.dart';
+import '../services/recognition_history_service.dart';
 import '../widgets/recognition_result_card.dart';
 
 class RecognitionScreen extends StatefulWidget {
@@ -13,18 +16,33 @@ class RecognitionScreen extends StatefulWidget {
   State<RecognitionScreen> createState() => _RecognitionScreenState();
 }
 
-class _RecognitionScreenState extends State<RecognitionScreen> {
+class _RecognitionScreenState extends State<RecognitionScreen> with TickerProviderStateMixin {
   final ImagePicker _picker = ImagePicker();
   final RecognitionService _recognitionService = RecognitionService();
-  
+  final RecognitionHistoryService _historyService = RecognitionHistoryService();
+
+  late TabController _tabController;
+
   File? _selectedImage;
   bool _isProcessing = false;
   CatRecognitionResult? _recognitionResult;
 
+  List<SavedBreed> _savedBreeds = [];
+  List<RecognitionHistory> _recognitionHistory = [];
+  bool _isLoadingHistory = true;
+
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 3, vsync: this);
     _initializeRecognitionService();
+    _loadHistoryData();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   Future<void> _initializeRecognitionService() async {
@@ -103,10 +121,16 @@ class _RecognitionScreenState extends State<RecognitionScreen> {
         predictions: predictions,
       );
 
+      // Save to history
+      await _historyService.addRecognitionHistory(result);
+
       setState(() {
         _recognitionResult = result;
         _isProcessing = false;
       });
+
+      // Refresh history data
+      _loadHistoryData();
     } catch (e) {
       setState(() {
         _isProcessing = false;
@@ -147,12 +171,206 @@ class _RecognitionScreenState extends State<RecognitionScreen> {
               onPressed: _clearResults,
             ),
         ],
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(icon: Icon(Icons.bookmark), text: 'Saved Breeds'),
+            Tab(icon: Icon(Icons.history), text: 'History'),
+            Tab(icon: Icon(Icons.camera_alt), text: 'Recognize'),
+          ],
+        ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          _buildSavedBreedsTab(),
+          _buildHistoryTab(),
+          _buildRecognitionTab(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSavedBreedsTab() {
+    if (_isLoadingHistory) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    return RefreshIndicator(
+      onRefresh: _loadHistoryData,
+      child: _savedBreeds.isEmpty
+          ? const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.bookmark_outline, size: 64, color: Colors.grey),
+                  SizedBox(height: 16),
+                  Text('No saved breeds yet'),
+                  SizedBox(height: 8),
+                  Text(
+                    'Save breeds from recognition results',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ],
+              ),
+            )
+          : GridView.builder(
+              padding: const EdgeInsets.all(16),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 0.8,
+              ),
+              itemCount: _savedBreeds.length,
+              itemBuilder: (context, index) {
+                final savedBreed = _savedBreeds[index];
+                return Card(
+                  elevation: 2,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                          ),
+                          child: savedBreed.imageUrl != null
+                              ? ClipRRect(
+                                  borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                                  child: savedBreed.imageUrl!.startsWith('http')
+                                      ? CachedNetworkImage(
+                                          imageUrl: savedBreed.imageUrl!,
+                                          fit: BoxFit.cover,
+                                          errorWidget: (context, url, error) => const Icon(Icons.pets, size: 32),
+                                        )
+                                      : Image.file(
+                                          File(savedBreed.imageUrl!),
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) => const Icon(Icons.pets, size: 32),
+                                        ),
+                                )
+                              : const Icon(Icons.pets, size: 32),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              savedBreed.breedName,
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '${(savedBreed.confidence * 100).toStringAsFixed(0)}% confidence',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+    );
+  }
+
+  Widget _buildHistoryTab() {
+    if (_isLoadingHistory) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    return RefreshIndicator(
+      onRefresh: _loadHistoryData,
+      child: _recognitionHistory.isEmpty
+          ? const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.history, size: 64, color: Colors.grey),
+                  SizedBox(height: 16),
+                  Text('No recognition history yet'),
+                  SizedBox(height: 8),
+                  Text(
+                    'Start recognizing cat breeds!',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ],
+              ),
+            )
+          : ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: _recognitionHistory.length,
+              itemBuilder: (context, index) {
+                final history = _recognitionHistory[index];
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  child: ListTile(
+                    leading: Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: history.imageUrl.startsWith('http')
+                            ? CachedNetworkImage(
+                                imageUrl: history.imageUrl,
+                                fit: BoxFit.cover,
+                                errorWidget: (context, url, error) => const Icon(Icons.pets),
+                              )
+                            : Image.file(
+                                File(history.imageUrl),
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) => const Icon(Icons.pets),
+                              ),
+                      ),
+                    ),
+                    title: Text(
+                      history.wasSuccessful
+                          ? history.topBreedName ?? 'Breed detected'
+                          : 'No breed detected',
+                    ),
+                    subtitle: Text(
+                      _formatHistoryDate(history.recognitionDate),
+                    ),
+                    trailing: history.wasSuccessful
+                        ? Text(
+                            '${(history.highestConfidence! * 100).toStringAsFixed(0)}%',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )
+                        : Icon(
+                            Icons.error_outline,
+                            color: Colors.red,
+                          ),
+                  ),
+                );
+              },
+            ),
+    );
+  }
+
+  Widget _buildRecognitionTab() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
             // Instructions Card
             if (_selectedImage == null) ...[
               Card(
@@ -275,10 +493,10 @@ class _RecognitionScreenState extends State<RecognitionScreen> {
                   ),
                 )
               else
-                ...(_recognitionResult!.predictions.asMap().entries.map((entry) {
+                ..._recognitionResult!.predictions.asMap().entries.map((entry) {
                   final index = entry.key;
                   final prediction = entry.value;
-                  
+
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 8),
                     child: RecognitionResultCard(
@@ -286,7 +504,7 @@ class _RecognitionScreenState extends State<RecognitionScreen> {
                       rank: index + 1,
                     ),
                   );
-                })),
+                }),
 
               const SizedBox(height: 16),
 
@@ -321,15 +539,55 @@ class _RecognitionScreenState extends State<RecognitionScreen> {
                 ],
               ),
             ],
-          ],
-        ),
+        ],
       ),
     );
   }
 
-  @override
-  void dispose() {
-    _recognitionService.dispose();
-    super.dispose();
+  String _formatHistoryDate(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date);
+
+    if (difference.inDays == 0) {
+      if (difference.inHours == 0) {
+        if (difference.inMinutes == 0) {
+          return 'Just now';
+        }
+        return '${difference.inMinutes}m ago';
+      }
+      return '${difference.inHours}h ago';
+    } else if (difference.inDays == 1) {
+      return 'Yesterday';
+    } else if (difference.inDays < 7) {
+      return '${difference.inDays}d ago';
+    } else {
+      return '${date.day}/${date.month}/${date.year}';
+    }
   }
-} 
+
+  Future<void> _loadHistoryData() async {
+    setState(() => _isLoadingHistory = true);
+
+    try {
+      await _historyService.initializeTables();
+
+      final results = await Future.wait([
+        _historyService.getSavedBreeds(limit: 10),
+        _historyService.getRecognitionHistory(limit: 10),
+      ]);
+
+      setState(() {
+        _savedBreeds = results[0] as List<SavedBreed>;
+        _recognitionHistory = results[1] as List<RecognitionHistory>;
+        _isLoadingHistory = false;
+      });
+    } catch (e) {
+      setState(() => _isLoadingHistory = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to load history: $e')),
+        );
+      }
+    }
+  }
+}

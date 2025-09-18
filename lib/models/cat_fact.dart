@@ -1,8 +1,8 @@
-// import 'package:json_annotation/json_annotation.dart';
+import 'package:json_annotation/json_annotation.dart';
 
-// part 'cat_fact.g.dart';
+part 'cat_fact.g.dart';
 
-// @JsonSerializable()
+@JsonSerializable()
 class CatFact {
   final String id;
   // @JsonKey(name: 'fact_text')
@@ -21,8 +21,8 @@ class CatFact {
     required this.dateAdded,
   });
 
-  // factory CatFact.fromJson(Map<String, dynamic> json) => _$CatFactFromJson(json);
-  // Map<String, dynamic> toJson() => _$CatFactToJson(this);
+  factory CatFact.fromJson(Map<String, dynamic> json) => _$CatFactFromJson(json);
+  Map<String, dynamic> toJson() => _$CatFactToJson(this);
 }
 
 // @JsonSerializable()

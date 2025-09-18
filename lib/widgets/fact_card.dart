@@ -126,7 +126,7 @@ class FactCard extends StatelessWidget {
       case 'general':
       default:
         return _CategoryStyle(
-          backgroundColor: theme.colorScheme.surfaceVariant,
+          backgroundColor: theme.colorScheme.surfaceContainerHighest,
           textColor: theme.colorScheme.onSurfaceVariant,
         );
     }

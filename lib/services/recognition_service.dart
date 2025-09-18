@@ -1,132 +1,76 @@
 import 'dart:io';
-import 'dart:typed_data';
-import 'package:image/image.dart' as img;
 import '../models/cat_recognition_result.dart';
+import '../utils/result.dart';
+import 'openai_service.dart';
 
 class RecognitionService {
-  static const int _inputSize = 224;
   static const double _confidenceThreshold = 0.1;
 
-  // Mock breed labels - in a real app, this would come from the ML model
-  static const List<String> _breedLabels = [
-    'maine_coon',
-    'persian',
-    'siamese',
-    'british_shorthair',
-    'ragdoll',
-    'bengal',
-    'abyssinian',
-    'russian_blue',
-    'scottish_fold',
-    'sphynx',
-    'norwegian_forest',
-    'american_shorthair',
-    'exotic_shorthair',
-    'birman',
-    'oriental_shorthair',
-  ];
+  OpenAIService? _openAIService;
 
-  static const Map<String, String> _breedNames = {
-    'maine_coon': 'Maine Coon',
-    'persian': 'Persian',
-    'siamese': 'Siamese',
-    'british_shorthair': 'British Shorthair',
-    'ragdoll': 'Ragdoll',
-    'bengal': 'Bengal',
-    'abyssinian': 'Abyssinian',
-    'russian_blue': 'Russian Blue',
-    'scottish_fold': 'Scottish Fold',
-    'sphynx': 'Sphynx',
-    'norwegian_forest': 'Norwegian Forest Cat',
-    'american_shorthair': 'American Shorthair',
-    'exotic_shorthair': 'Exotic Shorthair',
-    'birman': 'Birman',
-    'oriental_shorthair': 'Oriental Shorthair',
-  };
-
-  // Initialize the ML model (placeholder for TensorFlow Lite)
+  // Initialize the OpenAI service
   Future<void> initializeModel() async {
-    // TODO: Load TensorFlow Lite model
-    // interpreter = await Interpreter.fromAsset('assets/ml_models/cat_breed_classifier.tflite');
-    print('Recognition model initialized');
-  }
-
-  // Preprocess image for ML model
-  Uint8List _preprocessImage(File imageFile) {
-    // Read and decode image
-    final bytes = imageFile.readAsBytesSync();
-    img.Image? image = img.decodeImage(bytes);
-    
-    if (image == null) {
-      throw Exception('Failed to decode image');
-    }
-
-    // Resize image to model input size
-    image = img.copyResize(image, width: _inputSize, height: _inputSize);
-
-    // Convert to RGB and normalize
-    final input = Float32List(_inputSize * _inputSize * 3);
-    int pixelIndex = 0;
-    
-    for (int y = 0; y < _inputSize; y++) {
-      for (int x = 0; x < _inputSize; x++) {
-        final pixel = image.getPixel(x, y);
-        // Use the new API for getting color components
-        input[pixelIndex++] = (pixel.r / 255.0);
-        input[pixelIndex++] = (pixel.g / 255.0);
-        input[pixelIndex++] = (pixel.b / 255.0);
-      }
-    }
-
-    return input.buffer.asUint8List();
-  }
-
-  // Run inference on the image
-  Future<List<BreedPrediction>> recognizeBreed(File imageFile) async {
     try {
-      // Preprocess image
-      final input = _preprocessImage(imageFile);
-
-      // TODO: Run actual ML inference
-      // For now, return mock predictions
-      final predictions = _generateMockPredictions();
-
-      // Filter predictions by confidence threshold
-      final filteredPredictions = predictions
-          .where((p) => p.confidence >= _confidenceThreshold)
-          .toList();
-
-      // Sort by confidence (highest first)
-      filteredPredictions.sort((a, b) => b.confidence.compareTo(a.confidence));
-
-      // Return top 3 predictions
-      return filteredPredictions.take(3).toList();
+      final result = await OpenAIService.create();
+      result.when(
+        success: (service) {
+          _openAIService = service;
+          print('Recognition model initialized with OpenAI Vision API');
+        },
+        onError: (error) {
+          print('Failed to initialize OpenAI service: ${error.message}');
+          throw RecognitionException('Failed to initialize recognition service: ${error.message}');
+        },
+        loading: () {
+          // This shouldn't happen with the current implementation
+        },
+      );
     } catch (e) {
+      print('Failed to initialize recognition service: $e');
+      throw RecognitionException('Failed to initialize recognition service: $e');
+    }
+  }
+
+
+
+  // Run inference on the image using OpenAI Vision API
+  Future<List<BreedPrediction>> recognizeBreed(File imageFile) async {
+    if (_openAIService == null) {
+      throw RecognitionException('Recognition service not initialized. Please call initializeModel() first.');
+    }
+
+    try {
+      final result = await _openAIService!.analyzeCatImage(imageFile);
+
+      return result.when(
+        success: (predictions) {
+          // Filter predictions by confidence threshold
+          final filteredPredictions = predictions
+              .where((p) => p.confidence >= _confidenceThreshold)
+              .toList();
+
+          // Sort by confidence (highest first) - should already be sorted by OpenAI
+          filteredPredictions.sort((a, b) => b.confidence.compareTo(a.confidence));
+
+          // Return top 3 predictions
+          return filteredPredictions.take(3).toList();
+        },
+        onError: (error) {
+          throw RecognitionException('Failed to analyze image: ${error.message}');
+        },
+        loading: () {
+          throw RecognitionException('Unexpected loading state during image analysis');
+        },
+      );
+    } catch (e) {
+      if (e is RecognitionException) {
+        rethrow;
+      }
       throw RecognitionException('Failed to recognize breed: $e');
     }
   }
 
-  // Generate mock predictions for testing
-  List<BreedPrediction> _generateMockPredictions() {
-    final random = DateTime.now().millisecondsSinceEpoch;
-    final predictions = <BreedPrediction>[];
 
-    // Generate random predictions for demonstration
-    for (int i = 0; i < 5; i++) {
-      final breedIndex = (random + i) % _breedLabels.length;
-      final breedId = _breedLabels[breedIndex];
-      final breedName = _breedNames[breedId]!;
-      final confidence = (0.9 - (i * 0.15)).clamp(0.1, 1.0);
-
-      predictions.add(BreedPrediction(
-        breedId: breedId,
-        breedName: breedName,
-        confidence: confidence,
-      ));
-    }
-
-    return predictions;
-  }
 
   // Create recognition result
   CatRecognitionResult createRecognitionResult({
@@ -145,7 +89,8 @@ class RecognitionService {
 
   // Dispose resources
   void dispose() {
-    // TODO: Dispose TensorFlow Lite interpreter
+    _openAIService?.dispose();
+    _openAIService = null;
     print('Recognition service disposed');
   }
 }

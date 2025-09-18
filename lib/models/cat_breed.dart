@@ -1,34 +1,29 @@
-// import 'package:json_annotation/json_annotation.dart';
+import 'package:json_annotation/json_annotation.dart';
 
-// part 'cat_breed.g.dart';
+part 'cat_breed.g.dart';
 
-// @JsonSerializable()
+@JsonSerializable()
 class CatBreed {
   final String id;
   final String name;
   final List<String> aliases;
   final String origin;
-  // @JsonKey(name: 'breed_group')
+  @JsonKey(name: 'breed_group')
   final String breedGroup;
-  final List<BreedRecognition> recognition;
   final String history;
-  final Appearance appearance;
-  final Temperament temperament;
-  final Care care;
-  final Health health;
-  // @JsonKey(name: 'breed_standard_links')
-  final List<BreedStandardLink> breedStandardLinks;
-  // @JsonKey(name: 'fun_facts')
+  @JsonKey(name: 'fun_facts')
   final List<String> funFacts;
-  final List<MediaItem> images;
-  final List<MediaItem> videos;
-  // @JsonKey(name: 'adoption_resources')
-  final List<AdoptionResource> adoptionResources;
-  // @JsonKey(name: 'related_breeds')
+  @JsonKey(name: 'related_breeds')
   final List<String> relatedBreeds;
   final String status;
-  // @JsonKey(name: 'last_updated')
+  @JsonKey(name: 'last_updated')
   final DateTime lastUpdated;
+
+  // Simplified fields for now - complex nested objects will be added later
+  final String? temperamentSummary;
+  final String? appearanceDescription;
+  final String? careInstructions;
+  final String? healthInfo;
 
   const CatBreed({
     required this.id,
@@ -36,24 +31,19 @@ class CatBreed {
     required this.aliases,
     required this.origin,
     required this.breedGroup,
-    required this.recognition,
     required this.history,
-    required this.appearance,
-    required this.temperament,
-    required this.care,
-    required this.health,
-    required this.breedStandardLinks,
     required this.funFacts,
-    required this.images,
-    required this.videos,
-    required this.adoptionResources,
     required this.relatedBreeds,
     required this.status,
     required this.lastUpdated,
+    this.temperamentSummary,
+    this.appearanceDescription,
+    this.careInstructions,
+    this.healthInfo,
   });
 
-  // factory CatBreed.fromJson(Map<String, dynamic> json) => _$CatBreedFromJson(json);
-  // Map<String, dynamic> toJson() => _$CatBreedToJson(this);
+  factory CatBreed.fromJson(Map<String, dynamic> json) => _$CatBreedFromJson(json);
+  Map<String, dynamic> toJson() => _$CatBreedToJson(this);
 }
 
 // @JsonSerializable()
